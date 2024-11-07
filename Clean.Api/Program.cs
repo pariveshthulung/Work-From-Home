@@ -1,4 +1,5 @@
 using Clean.Api.Dependency;
+using Clean.Api.Middleware;
 using Clean.Application;
 using Clean.Infrastructure;
 
@@ -44,5 +45,6 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.Run();

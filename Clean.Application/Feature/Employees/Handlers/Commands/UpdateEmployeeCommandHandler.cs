@@ -38,7 +38,7 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
         if (!validatorResult.IsValid)
         {
             var errors = validatorResult
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
+                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
                 .ToList();
             return BaseResult<Unit>.Failure(errors);
         }

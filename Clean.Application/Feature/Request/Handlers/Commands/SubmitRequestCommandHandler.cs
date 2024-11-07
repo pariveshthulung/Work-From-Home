@@ -40,7 +40,7 @@ public class SubmitRequestCommandHandler : IRequestHandler<SubmitRequestCommand,
         if (!validationResult.IsValid)
         {
             var errors = validationResult
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
+                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
                 .ToList();
             return BaseResult<Guid>.Failure(errors);
         }

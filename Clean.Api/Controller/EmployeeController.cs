@@ -1,5 +1,6 @@
 using System.Net;
 using Clean.Api.Controller.Common;
+using Clean.Api.Extension;
 using Clean.Application.Dto.Employee;
 using Clean.Application.Feature.Employees.Handlers.Commands.LoggedUserProfile;
 using Clean.Application.Feature.Employees.Request.Commands;
@@ -45,7 +46,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -63,7 +65,7 @@ namespace Clean.Api.Controller
             var response = await mediator.Send(request, cancellationToken);
 
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
 
             return Ok(response.Data);
         }
@@ -79,7 +81,7 @@ namespace Clean.Api.Controller
             var response = await mediator.Send(request, cancellationToken);
 
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
 
             return Ok(response.Data);
         }
@@ -99,7 +101,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
         #endregion
@@ -120,8 +123,10 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return NoContent();
+            // return Results.Ok(response.Data);
         }
 
         [Authorize(Policy = "Adminstrator")]
@@ -140,7 +145,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return NoContent();
         }
     }

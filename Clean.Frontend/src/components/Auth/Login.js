@@ -69,7 +69,7 @@ export default function Login() {
       }
       if (err.response && Array.isArray(err.response.data.errors)) {
         err.response.data.errors.forEach((errorObj) => {
-          toast.error(`${errorObj.field}: ${errorObj.message}`);
+          toast.error(`${errorObj.fieldName}: ${errorObj.descriptions}`);
         });
       } else {
         toast.error("something went wrong!!!");

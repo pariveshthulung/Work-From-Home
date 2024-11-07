@@ -1,5 +1,6 @@
 using System.Net;
 using Clean.Api.Controller.Common;
+using Clean.Api.Extension;
 using Clean.Application.Dto.Approval;
 using Clean.Application.Dto.Request;
 using Clean.Application.Feature.Request.Requests.Queries;
@@ -32,7 +33,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -52,7 +54,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -71,7 +74,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -89,7 +93,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -109,7 +114,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return NoContent();
         }
 
@@ -128,7 +134,7 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
             return Created();
         }
 
@@ -147,7 +153,8 @@ namespace Clean.Api.Controller
                 cancellationToken
             );
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return NoContent();
         }
     }

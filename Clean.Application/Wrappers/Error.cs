@@ -3,13 +3,13 @@ namespace Clean.Application.Wrappers;
 public class Error
 {
     public int ErrorCode { get; set; }
-    public string? FiledName { get; set; } = null;
+    public string? FieldName { get; set; } = null;
     public string? Descriptions { get; set; } = null;
 
-    public Error(int errorCode, string? filedName, string? description)
+    public Error(int errorCode, string? fieldName, string? description)
     {
         ErrorCode = errorCode;
-        FiledName = filedName;
+        FieldName = fieldName;
         Descriptions = description;
     }
 
@@ -19,11 +19,11 @@ public class Error
             return false;
         return ErrorCode == other.ErrorCode
             && Descriptions == other.Descriptions
-            && FiledName == other.FiledName;
+            && FieldName == other.FieldName;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Descriptions, ErrorCode, FiledName);
+        return HashCode.Combine(Descriptions, ErrorCode, FieldName);
     }
 }

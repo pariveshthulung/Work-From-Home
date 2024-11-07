@@ -1,5 +1,6 @@
 using System.Net;
 using Clean.Api.Controller.Common;
+using Clean.Api.Extension;
 using Clean.Application.Dto.Token;
 using Clean.Application.Feature.Auth.Commands.ChangePassword;
 using Clean.Application.Feature.Auth.Commands.Login;
@@ -29,7 +30,8 @@ namespace Clean.Api.Controller
             var response = await mediator.Send(command, cancellationToken);
 
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Created();
         }
 
@@ -46,7 +48,8 @@ namespace Clean.Api.Controller
         {
             var response = await mediator.Send(command, cancellationToken);
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return Ok(response.Data);
         }
 
@@ -62,7 +65,8 @@ namespace Clean.Api.Controller
         {
             var response = await mediator.Send(command, cancellationToken);
             if (!response.Success)
-                return BadRequest(response.Errors);
+                return response.ToProblemDetail();
+
             return NoContent();
         }
     }
