@@ -86,6 +86,13 @@ public class SubmitRequestCommandHandler : IRequestHandler<SubmitRequestCommand,
             );
 
         var toRequest = _mapper.Map<GeneralRequest>(request.CreateRequestDto);
+        // var toRequest = GeneralRequest.Create(
+        //     currentUser.Id,
+        //     request.CreateRequestDto.RequestedTo,
+        //     request.CreateRequestDto.FromDate,
+        //     request.CreateRequestDto.ToDate,
+        //     request.CreateRequestDto.Description
+        // );
 
         //4.submit request
         currentUser.SubmitRequest(toRequest);

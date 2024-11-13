@@ -13,8 +13,8 @@ public record RequestDto : BaseDto
     public string RequestedToEmail { get; init; }
     public int RequestedTypeId { get; init; }
     public string RequestedType { get; init; }
+    public string Description { get; init; }
     public ApprovalDto Approval { get; init; }
     public DateTime ToDate { get; init; }
     public DateTime FromDate { get; init; }
-    public string Description { get; init; }
 }

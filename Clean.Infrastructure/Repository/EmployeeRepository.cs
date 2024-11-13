@@ -108,10 +108,17 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
             context.Entry(employee.Address!).State = EntityState.Modified;
             foreach (var request in employee.Requests)
             {
-                context.Entry(request).State = EntityState.Modified;
-                if (request.Approval != null)
+                if (request.Id != 0)
                 {
-                    context.Entry(request.Approval).State = EntityState.Modified;
+                    context.Entry(request).State = EntityState.Modified;
+                    if (request.Approval != null)
+                    {
+                        context.Entry(request.Approval).State = EntityState.Modified;
+                    }
+                }
+                else
+                {
+                    context.Entry(request).State = EntityState.Added;
                 }
             }
 

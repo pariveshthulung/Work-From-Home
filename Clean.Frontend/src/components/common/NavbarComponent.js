@@ -26,7 +26,14 @@ const NavbarComponent = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light mb-5">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+        <a
+          style={{ cursor: "pointer" }}
+          className="navbar-brand"
+          onClick={() => {
+            setActive("Request");
+            navigate("/userRequest");
+          }}
+        >
           WorkFromHome
         </a>
         <button

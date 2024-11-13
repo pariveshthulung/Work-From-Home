@@ -225,6 +225,14 @@ public class ApproveRequestCommandHandlerTest
             1,
             Address.Create("Charali", "Jhapa", "3453454")
         );
+        var currentEmployee = GeneralEmployee.Create(
+            "hari",
+            "hari@gmail.com",
+            "9876543210",
+            1,
+            Address.Create("Charali", "Jhapa", "3453454")
+        );
+        currentEmployee.SetId(2);
         var request = GeneralRequest.Create(
             1,
             2,
@@ -242,7 +250,7 @@ public class ApproveRequestCommandHandlerTest
             .Setup(x =>
                 x.GetEmployeeByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())
             )
-            .ReturnsAsync(employee);
+            .ReturnsAsync(currentEmployee);
 
         //Act
         var result = await _handler.Handle(command, default);

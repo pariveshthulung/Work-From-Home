@@ -40,13 +40,31 @@ export default function UserRequest() {
   }, [fetchUserData]);
 
   return (
-    <div>
-      {/* <ToastContainer /> */}
-      <Request
-        heading={"My Request"}
-        requests={requests}
-        button={<Button name="Submit Request" goto="/submitRequest" />}
-      />
-    </div>
+    <section className="vh-100 gradient-custom">
+      <div className="container py-5">
+        <div className="row  d-flex justify-content-center h-100">
+          <div className="col-12">
+            <div
+              className="card bg-light text-dark"
+              style={{ borderRadius: "1rem" }}
+            >
+              <div className="mt-4 mx-5 text-center">
+                <h1>My Requests</h1>
+              </div>
+              <div>
+                <div className="mb-3">
+                  <Request
+                    requests={requests}
+                    button={
+                      <Button name="Submit Request" goto="/submitRequest" />
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

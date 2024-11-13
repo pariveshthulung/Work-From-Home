@@ -62,6 +62,8 @@ public class ApproveRequestCommandHandler : IRequestHandler<ApproveRequestComman
             );
             if (currentUser is null)
                 return BaseResult<int>.Failure(EmployeeErrors.Unauthorize());
+            if (request.RequestedTo != currentUser.Id)
+                return BaseResult<int>.Failure(RequestErrors.UnauthorizeToApprove());
 
             currentUser.ApproveRequest(request, command.ApproveRequestDto.ApprovalStatusId);
 

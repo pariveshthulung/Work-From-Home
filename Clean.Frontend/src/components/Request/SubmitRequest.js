@@ -101,7 +101,7 @@ export default function SubmitRequest() {
                         <div className="row">
                           <div className="form-group mb-4">
                             <label htmlFor="dropdown" className="mb-2">
-                              Request to (email):
+                              Request to (email)
                             </label>
                             <select
                               id="dropdown"
@@ -124,8 +124,8 @@ export default function SubmitRequest() {
                             Description
                           </label>
                           <textarea
-                            type="email"
-                            value={email}
+                            type="text"
+                            value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="form-control"
                           />
