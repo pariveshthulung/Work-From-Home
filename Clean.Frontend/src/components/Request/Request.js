@@ -52,19 +52,15 @@ export default function Request({
   };
 
   const handleStatusClick = async (employeeId, requestId, statusId) => {
-    // console.log(status);
-    // console.log(id);
     try {
       var response = await httpClient.put(`/api/Request/approverequest`, {
         employeeId: employeeId,
         approvalStatusId: statusId,
         requestId: requestId,
       });
-      // .finally(() => setLoading(true));
       console.log(response);
       toast.success("Request status changed sucessfully!!");
       await fetchRequest();
-      // console.log(newRequests);
     } catch (err) {
       console.log(err);
       if (err.response && Array.isArray(err.response.data.errors)) {

@@ -1,3 +1,6 @@
+using System.Linq.Expressions;
+using AutoMapper;
+using Clean.Application.Dto.Request;
 using Clean.Application.Helper;
 using Clean.Application.Persistence.Contract;
 using Clean.Domain.Entities;
@@ -7,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Clean.Infrastructure.Repository;
 
-public class RequestRepository(ApplicationDbContext context) : IRequestRepository
+public class RequestRepository(ApplicationDbContext context, IMapper mapper) : IRequestRepository
 {
     public async Task DeleteRequestAsync(Request request, CancellationToken cancellationToken)
     {
@@ -22,22 +25,53 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         }
     }
 
-    public async Task<List<Request>> GetAllRequestAsync(
-        QueryObject query,
+    public async Task<PagedList<RequestDto>> GetAllRequestAsync(
+        string? searchTerm,
+        string? sortColumn,
+        string? sortOrder,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken
     )
     {
         try
         {
-            var requests = context.Requests.Include(x => x.Employee).AsQueryable();
-
-            return await requests
+            IQueryable<Request> requests = context
+                .Requests.Include(x => x.Employee)
+                .Include(x => x.RequestedByEmployee)
                 .Include(x => x.Approval)
-                .Include(x => x.RequestedToEmployee)
-                // .Include(x => x.AddedByEmployee)
-                // .Include(x => x.UpdatedByEmployee)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .Include(x => x.RequestedType)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                requests = requests.Where(x =>
+                    x.Employee!.Email.Contains(searchTerm) || x.Employee.Name.Contains(searchTerm)
+                );
+            }
+
+            Expression<Func<Request, object>> keyselector = sortColumn?.ToLower() switch
+            {
+                "name" => request => request.Employee!.Name,
+                "email" => request => request.Employee!.Email,
+                _ => request => request.Id,
+            };
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                requests = requests.OrderByDescending(keyselector);
+            }
+            else
+            {
+                requests = requests.OrderBy(keyselector);
+            }
+            var requestsDto = requests.Select(x => mapper.Map<RequestDto>(x));
+            var requestPagedList = await PagedList<RequestDto>.CreateAsync(
+                requestsDto,
+                pageNumber,
+                pageSize
+            );
+            return requestPagedList;
         }
         catch (Exception)
         {

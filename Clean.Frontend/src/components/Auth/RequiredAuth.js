@@ -83,7 +83,6 @@ const RequiredAuth = ({ children }) => {
         userRole === "SuperAdmin" ||
         userRole === "Ceo"
       ) {
-        navigate("/", { state: { showToast: "Login successfull!!!!" } }); // Redirect to home for managers and above
       } else {
         navigate("/userRequest", {
           state: { showToast: "Login successfull!!!!" },

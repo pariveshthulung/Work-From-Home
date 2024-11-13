@@ -1,6 +1,3 @@
-using Clean.Domain.Common;
-using Clean.Domain.DomainEvents;
-using Clean.Domain.Enums;
 using Clean.Domain.Primitive;
 
 namespace Clean.Domain.Entities
@@ -12,7 +9,8 @@ namespace Clean.Domain.Entities
         public int UserRoleId { get; private set; }
         public UserRole? UserRole { get; private set; }
         public string PhoneNumber { get; private set; } = default!;
-        public Address? Address { get; private set; }
+
+        public Address? Address { get; set; }
         private List<Request> _request = [];
         public IReadOnlyCollection<Request> Requests => _request;
         public int AppUserId { get; private set; }
@@ -32,23 +30,21 @@ namespace Clean.Domain.Entities
             Email = ValidationGuard.ValidateEmail(email);
             PhoneNumber = ValidationGuard.ValidatePhoneNumber(phoneNumber);
             UserRoleId = userRoleId;
-            Address = address;
+            // Address = address;
         }
 
-        public void Update(
-            string name,
-            string email,
-            string phoneNumber,
-            int userRoleId,
-            Address address
-        )
+        public void Update(string name, string email, string phoneNumber, int userRoleId)
         {
             Name = ValidationGuard.ValidateString(name, nameof(name));
             Email = ValidationGuard.ValidateEmail(email);
             PhoneNumber = ValidationGuard.ValidatePhoneNumber(phoneNumber);
             UserRoleId = userRoleId;
-            Address = address;
             UpdatedOn = DateTime.UtcNow;
+        }
+
+        public void UpdateEmployeeAddress(Address address)
+        {
+            this.Address = address;
         }
 
         public Request SubmitRequest(Request request)
@@ -59,7 +55,7 @@ namespace Clean.Domain.Entities
                 _request.Add(request);
                 request.SetAddedBy(request.RequestedBy);
                 request.SetAddedOn(DateTime.UtcNow);
-                RaiseDomainEvent(new RequestSubmittedDomainEvent(request));
+                // RaiseDomainEvent(new RequestSubmittedDomainEvent(request));
                 return request;
             }
             catch (Exception)
@@ -78,7 +74,7 @@ namespace Clean.Domain.Entities
                 request.Approval.SetStatus(approvalStatusId);
                 request.Approval.SetUpdatedBy(Id);
                 request.Approval.SetUpdatdOn(DateTime.UtcNow);
-                RaiseDomainEvent(new RequestApprovedDomainEvent(request));
+                // RaiseDomainEvent(new RequestApprovedDomainEvent(request));
             }
             catch (Exception)
             {
@@ -89,16 +85,6 @@ namespace Clean.Domain.Entities
         public virtual void DeleteRequest(Request request)
         {
             _request.Remove(request);
-        }
-
-        public void SetId(int id)
-        {
-            Id = id;
-        }
-
-        public void SetGuidId(Guid guidId)
-        {
-            GuidId = guidId;
         }
 
         public void SetAppUserId(int id)

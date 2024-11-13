@@ -29,7 +29,7 @@ export default function ChangePassword() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await httpClient.put("/api/Auth/updatepassword", {
+      const response = await httpClient.put("/api/Auth/updatePassword", {
         currentPassword,
         email,
         newPassword,

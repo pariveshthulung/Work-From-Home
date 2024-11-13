@@ -3,6 +3,7 @@ using Clean.Api.Controller.Common;
 using Clean.Api.Extension;
 using Clean.Application.Dto.Employee;
 using Clean.Application.Feature.Employees.Handlers.Commands.LoggedUserProfile;
+using Clean.Application.Feature.Employees.Handlers.Queries.ManagersEmail;
 using Clean.Application.Feature.Employees.Request.Commands;
 using Clean.Application.Feature.Employees.Request.Queries;
 using Clean.Application.Feature.Employees.Requests.Commands;
@@ -77,13 +78,20 @@ namespace Clean.Api.Controller
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetLoggedInUserAsync(CancellationToken cancellationToken)
         {
-            var request = new LoggedUserProfileQuery();
-            var response = await mediator.Send(request, cancellationToken);
+            try
+            {
+                var request = new LoggedUserProfileQuery();
+                var response = await mediator.Send(request, cancellationToken);
 
-            if (!response.Success)
-                return response.ToProblemDetail();
+                if (!response.Success)
+                    return response.ToProblemDetail();
 
-            return Ok(response.Data);
+                return Ok(response.Data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("getEmployeeByGuidId")]
@@ -148,6 +156,20 @@ namespace Clean.Api.Controller
                 return response.ToProblemDetail();
 
             return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("getManagersEmail")]
+        [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetManagersEmail(CancellationToken cancellationToken)
+        {
+            var response = await mediator.Send(new GetManagersEmailQuery(), cancellationToken);
+            if (!response.Success)
+                return response.ToProblemDetail();
+
+            return Ok(response.Data);
         }
     }
 }

@@ -9,8 +9,6 @@ import AuthContext from "../../context/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import httpClient from "../Api/HttpClient";
-import { data } from "jquery";
-import { delay } from "@okta/okta-auth-js";
 
 function EmployeeIndex({ button }) {
   const navigate = useNavigate();
@@ -125,31 +123,6 @@ function EmployeeIndex({ button }) {
           </div>
           <div className="col-12">
             <div className="mx-5 mt-3">
-              {/* <div className="d-flex justify-content-end ">
-              <Link to="/addEmployee">
-                <button type="button" className="btn btn-primary my-2">
-                  Add
-                </button>
-              </Link>
-            </div> */}
-
-              {/* <div className="col-12">
-                <div>
-                  <form class="d-flex col-6">
-                    <input
-                      class="form-control me-2"
-                      type="search"
-                      placeholder="Search"
-                      aria-label="Search"
-                    />
-                    <button class="btn btn-outline-success" type="submit">
-                      Search
-                    </button>
-                  </form>
-                </div>
-
-                <div>{button}</div>
-              </div> */}
               <div className="row">
                 <div className="col-md-2 my-auto">
                   show
@@ -158,7 +131,6 @@ function EmployeeIndex({ button }) {
                     value={pageSize}
                     onChange={(e) => setPageSize(e.target.value)}
                   >
-                    {/* <option value={pageSize}>Select an option</option> */}
                     {pageOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -200,7 +172,7 @@ function EmployeeIndex({ button }) {
                   {employee.map((employee, i) => (
                     <tr style={{ cursor: "pointer" }} key={employee.id}>
                       <td onClick={() => handleRowClick(employee.guidId)}>
-                        {i + 1}
+                        {startEntry + i}
                       </td>
                       <td onClick={() => handleRowClick(employee.guidId)}>
                         {employee.email}

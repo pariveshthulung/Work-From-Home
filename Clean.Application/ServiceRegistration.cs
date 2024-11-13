@@ -16,7 +16,7 @@ public static class ServiceRegistration
             // cfg.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly)
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()) //ttry
         );
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoginPipelineBehaviour<,>));
+        // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoginPipelineBehaviour<,>));
         return services;
     }
 }

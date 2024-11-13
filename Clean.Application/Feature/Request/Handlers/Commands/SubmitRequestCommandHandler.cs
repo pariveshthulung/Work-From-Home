@@ -70,11 +70,11 @@ public class SubmitRequestCommandHandler : IRequestHandler<SubmitRequestCommand,
             return BaseResult<Guid>.Failure(
                 new Error(400, "Request.Submit", "Can't submit to own email")
             );
+        var existingEmployee = currentUser;
 
         //3.check previous pending request
         var previousRequestExist = currentUser.Requests.Any(x =>
-            x.Approval.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
-            && x.RequestedTypeId == request.CreateRequestDto.RequestedTypeId
+            x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
         );
         if (previousRequestExist)
             return BaseResult<Guid>.Failure(
@@ -89,7 +89,11 @@ public class SubmitRequestCommandHandler : IRequestHandler<SubmitRequestCommand,
 
         //4.submit request
         currentUser.SubmitRequest(toRequest);
-        await _employeeRepository.UpdateEmployeeAsync(currentUser, cancellationToken);
+        await _employeeRepository.UpdateEmployeeAsync(
+            currentUser,
+            existingEmployee,
+            cancellationToken
+        );
         // await _employeeRepository.SaveChangesAsync(cancellationToken);
         return BaseResult<Guid>.Ok(toRequest.GuidId);
     }

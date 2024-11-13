@@ -46,6 +46,7 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
             request.UpdateEmployeeDto.Id,
             cancellationToken
         );
+        var existingEmployee = employee;
 
         if (employee is null)
             return BaseResult<Unit>.Failure(EmployeeErrors.NotFound());
@@ -55,16 +56,18 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
             cancellationToken
         );
 
+        var addressDetails = _mapper.Map<Address>(request.UpdateEmployeeDto.Address);
         employee.Update(
             request.UpdateEmployeeDto.Name,
             request.UpdateEmployeeDto.Email,
             request.UpdateEmployeeDto.PhoneNumber,
-            request.UpdateEmployeeDto.UserRoleId,
-            _mapper.Map<Address>(request.UpdateEmployeeDto.Address) // employee.Address!.ToAddress()
+            request.UpdateEmployeeDto.UserRoleId
         );
-        employee.SetUpdatedBy(currentUser!.Id);
 
-        await _employeeRepo.UpdateEmployeeAsync(employee, cancellationToken);
+        employee.UpdateEmployeeAddress(addressDetails);
+        employee.SetUpdatedBy(currentUser.Id);
+
+        await _employeeRepo.UpdateEmployeeAsync(employee, existingEmployee, cancellationToken);
         return BaseResult<Unit>.Ok(Unit.Value);
     }
 }

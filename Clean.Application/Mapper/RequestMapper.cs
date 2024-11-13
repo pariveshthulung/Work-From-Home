@@ -12,9 +12,9 @@ public static class RequestMapper
         var request = GeneralRequest.Create(
             requestDto.RequestedBy,
             requestDto.RequestedTo,
-            requestDto.RequestedTypeId,
             requestDto.FromDate,
-            requestDto.ToDate
+            requestDto.ToDate,
+            requestDto.Description
         );
         if (requestDto.Id > 0)
         {

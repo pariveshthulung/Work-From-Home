@@ -13,7 +13,7 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services)
     {
-        services.AddQuartz();
+        // services.AddQuartz();
 
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();

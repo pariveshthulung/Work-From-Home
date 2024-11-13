@@ -16,4 +16,5 @@ public record RequestDto : BaseDto
     public ApprovalDto Approval { get; init; }
     public DateTime ToDate { get; init; }
     public DateTime FromDate { get; init; }
+    public string Description { get; init; }
 }

@@ -7,20 +7,20 @@ public class GeneralRequest : Request
     private GeneralRequest(
         int requestBy,
         int requestTo,
-        int requestedTypeId,
         DateTime fromDate,
-        DateTime toDate
+        DateTime toDate,
+        string description
     )
-        : base(requestBy, requestTo, requestedTypeId, fromDate, toDate) { }
+        : base(requestBy, requestTo, fromDate, toDate, description) { }
 
     public static GeneralRequest Create(
         int requestBy,
         int requestTo,
-        int requestedTypeId,
         DateTime fromDate,
-        DateTime toDate
+        DateTime toDate,
+        string description
     )
     {
-        return new GeneralRequest(requestBy, requestTo, requestedTypeId, fromDate, toDate);
+        return new GeneralRequest(requestBy, requestTo, fromDate, toDate, description);
     }
 }

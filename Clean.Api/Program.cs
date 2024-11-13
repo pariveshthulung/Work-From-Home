@@ -43,6 +43,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 app.UseAuthentication();
+app.UseMiddleware<TokenRefreshMiddleware>();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlingMiddleware>();

@@ -23,6 +23,16 @@ namespace Clean.Domain.Common
             GuidId = Guid.NewGuid();
         }
 
+        public void SetId(int id)
+        {
+            Id = id;
+        }
+
+        public void SetGuidId(Guid guidId)
+        {
+            GuidId = guidId;
+        }
+
         public void SetAddedBy(int id)
         {
             AddedBy = id;

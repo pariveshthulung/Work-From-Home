@@ -6,7 +6,6 @@ using Clean.Application.Persistence.Contract;
 using Clean.Application.Wrappers;
 using Clean.Domain.Entities;
 using FluentAssertions;
-using MediatR;
 using Moq;
 using Xunit;
 
@@ -16,7 +15,6 @@ public class ApproveRequestCommandHandlerTest
 {
     private readonly Mock<IEmployeeRepository> _employeeRepositoryMock;
     private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IRequestRepository> _requestRepoMock;
     private readonly Mock<ICurrentUserService> _currentUserMock;
     private readonly ApproveRequestCommandHandler _handler;
 
@@ -25,12 +23,10 @@ public class ApproveRequestCommandHandlerTest
         _employeeRepositoryMock = new();
         _mapperMock = new Mock<IMapper>();
         _currentUserMock = new Mock<ICurrentUserService>();
-        _requestRepoMock = new();
         _handler = new ApproveRequestCommandHandler(
             _mapperMock.Object,
             _employeeRepositoryMock.Object,
-            _currentUserMock.Object,
-            _requestRepoMock.Object
+            _currentUserMock.Object
         );
     }
 
@@ -56,7 +52,12 @@ public class ApproveRequestCommandHandlerTest
             Times.Never
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -90,7 +91,12 @@ public class ApproveRequestCommandHandlerTest
             Times.Once
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -130,7 +136,12 @@ public class ApproveRequestCommandHandlerTest
             Times.Once
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -155,8 +166,14 @@ public class ApproveRequestCommandHandlerTest
             1,
             Address.Create("Charali", "Jhapa", "3453454")
         );
-        var request = GeneralRequest.Create(1, 2, 1, DateTime.UtcNow, DateTime.UtcNow.AddDays(2));
-        request.SetGuiId(requestId);
+        var request = GeneralRequest.Create(
+            1,
+            2,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddDays(2),
+            "sick"
+        );
+        request.SetGuidId(requestId);
         employee.SubmitRequest(request);
         _employeeRepositoryMock
             .Setup(x => x.GetEmployeeByGuidIdAsync(employeeId, It.IsAny<CancellationToken>()))
@@ -178,7 +195,12 @@ public class ApproveRequestCommandHandlerTest
             Times.Once
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -203,8 +225,14 @@ public class ApproveRequestCommandHandlerTest
             1,
             Address.Create("Charali", "Jhapa", "3453454")
         );
-        var request = GeneralRequest.Create(1, 2, 1, DateTime.UtcNow, DateTime.UtcNow.AddDays(2));
-        request.SetGuiId(requestId);
+        var request = GeneralRequest.Create(
+            1,
+            2,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddDays(2),
+            "sick"
+        );
+        request.SetGuidId(requestId);
         request.SetId(10);
         employee.SubmitRequest(request);
         _employeeRepositoryMock
@@ -226,7 +254,12 @@ public class ApproveRequestCommandHandlerTest
             Times.Once
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
         result.Data.Should().Be(10);

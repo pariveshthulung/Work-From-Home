@@ -26,14 +26,21 @@ public class GetEmployeeListQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var employees = await _employeeRepo.GetAllEmployeeAsync(
-            request.SearchTerm,
-            request.SortColumn,
-            request.SortOrder,
-            request.PageNumber,
-            request.PageSize,
-            cancellationToken
-        );
-        return BaseResult<PagedList<EmployeeDto>>.Ok(employees);
+        try
+        {
+            var employees = await _employeeRepo.GetAllEmployeeAsync(
+                request.SearchTerm,
+                request.SortColumn,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize,
+                cancellationToken
+            );
+            return BaseResult<PagedList<EmployeeDto>>.Ok(employees);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

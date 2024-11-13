@@ -15,11 +15,6 @@ public class TokenService(IConfiguration configuration, UserManager<AppUser> use
 {
     public async Task<string> GenerateAccessTokenAsync(AppUser user)
     {
-        try { }
-        catch (Exception)
-        {
-            throw;
-        }
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(configuration["JWT:SigningKey"] ?? string.Empty)
         );
@@ -42,7 +37,8 @@ public class TokenService(IConfiguration configuration, UserManager<AppUser> use
             Issuer = configuration["JWT:Issuer"],
             Audience = configuration["JWT:Audience"],
             SigningCredentials = credential,
-            Expires = DateTime.UtcNow.AddDays(7)
+            // Expires = DateTime.UtcNow.AddDays(7)
+            Expires = DateTime.UtcNow.AddHours(3)
         };
         // var tokenHandler = new JsonWebTokenHandler();
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -102,5 +98,19 @@ public class TokenService(IConfiguration configuration, UserManager<AppUser> use
         {
             throw;
         }
+    }
+
+    public bool IsTokenExpired(string token)
+    {
+        // Decode the JWT token
+        var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+
+        if (jwtToken != null)
+        {
+            var expiration = jwtToken.ValidTo;
+
+            return expiration < DateTime.UtcNow;
+        }
+        return true;
     }
 }

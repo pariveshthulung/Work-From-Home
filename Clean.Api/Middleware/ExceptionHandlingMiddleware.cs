@@ -5,9 +5,13 @@ namespace Clean.Api.Middleware;
 
 public class ExceptionHandlingMiddleware
 {
-    private readonly RequestDelegate _next
+    private readonly RequestDelegate _next;
     private ILogger<ExceptionHandlingMiddleware> _logger;
-public ExceptionHandlingMiddleware(RequestDelegate next,ILogger<ExceptionHandlingMiddleware> logger)
+
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger
+    )
     {
         _next = next;
         _logger = logger;
@@ -15,9 +19,12 @@ public ExceptionHandlingMiddleware(RequestDelegate next,ILogger<ExceptionHandlin
 
     public async Task Invoke(HttpContext context)
     {
-        try{
+        try
+        {
             await _next(context);
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             _logger.LogError(ex, "Exception occured: {message}", ex.Message);
             var problemDetails = new ProblemDetails
             {
@@ -26,8 +33,15 @@ public ExceptionHandlingMiddleware(RequestDelegate next,ILogger<ExceptionHandlin
                 Type = "https://httpstatuses.com/500",
                 Extensions = new Dictionary<string, object?>
                 {
-                    {"errors",new {fieldName = "Error" , descriptions ="An unexpected error occurred. Please try again later."}}
-                } 
+                    {
+                        "errors",
+                        new
+                        {
+                            fieldName = "Error",
+                            descriptions = "An unexpected error occurred. Please try again later."
+                        }
+                    }
+                }
             };
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsJsonAsync(problemDetails);

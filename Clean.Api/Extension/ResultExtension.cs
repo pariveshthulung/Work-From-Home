@@ -22,7 +22,7 @@ public static class ResultExtension
         {
             Status = statusCode,
             Title = result?.Errors?.FirstOrDefault()?.FieldName ?? "Error:",
-            Type = $"https://httpstatuses.com/{statusCode}", // Optional: Link to specific HTTP status code info
+            Type = $"https://httpstatuses.com/{statusCode}",
             Extensions = new Dictionary<string, object?> { { "errors", result.Errors.ToList() } }
         };
 

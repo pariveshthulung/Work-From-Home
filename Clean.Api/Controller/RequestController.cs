@@ -39,6 +39,33 @@ namespace Clean.Api.Controller
         }
 
         [Authorize(Policy = "Adminstrator")]
+        [HttpGet("getAllPagedListRequestDto")]
+        [ProducesResponseType(typeof(PagedList<RequestDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetAllPagedListRequestDtoAsync(
+            [FromQuery] QueryObject query,
+            CancellationToken cancellationToken
+        )
+        {
+            var response = await mediator.Send(
+                new GetAllPagedListRequestDtoQuery
+                {
+                    SearchTerm = query.SearchTerm,
+                    SortColumn = query.SortColumn,
+                    SortOrder = query.SortOrder,
+                    PageNumber = query.PageNumber,
+                    PageSize = query.PageSize
+                },
+                cancellationToken
+            );
+            if (!response.Success)
+                return response.ToProblemDetail();
+
+            return Ok(response.Data);
+        }
+
+        [Authorize(Policy = "Adminstrator")]
         [HttpGet("getAllRequestSubmitToUser")]
         [ProducesResponseType(typeof(List<RequestDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

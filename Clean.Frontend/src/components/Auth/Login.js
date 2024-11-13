@@ -5,12 +5,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import httpClient from "../Api/HttpClient";
 import { useLocation } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import AuthContext from "../../context/AuthProvider";
 
 import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { oktaAuth, authState } = useOktaAuth();
+  const authContext = useAuth(AuthContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +58,24 @@ export default function Login() {
       console.log(token);
       localStorage.setItem("accessToken", token.accessToken);
       localStorage.setItem("refreshToken", token.refreshToken);
-      navigate("/listRequest", { replace: true });
+      if (authContext.auth) {
+        const userRole = authContext.auth.userRole;
+        if (
+          userRole === "Manager" ||
+          userRole === "Admin" ||
+          userRole === "SuperAdmin" ||
+          userRole === "Ceo"
+        ) {
+          navigate("/listRequest", {
+            state: { showToast: "Login successfull!!!!" },
+          });
+        } else {
+          navigate("/userRequest", {
+            state: { showToast: "Login successfull!!!!" },
+          });
+        }
+      }
+      // navigate("/listRequest", { replace: true });
       console.log(response);
     } catch (err) {
       console.log(err);
