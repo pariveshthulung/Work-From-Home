@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Clean.Application.Dto.Employee;
 using Clean.Application.Helper;
 using Clean.Domain.Entities;
@@ -9,6 +10,7 @@ public interface IEmployeeRepository
     Task<Employee?> GetEmployeeByGuidIdAsync(Guid guidId, CancellationToken cancellationToken);
     Task<List<string>?> GetManagerEmailAsync(CancellationToken cancellationToken);
     Task<bool> EmailExistAsync(string email, CancellationToken cancellationToken);
+    Task<bool> EmailExistIncludeDeletedAsync(string email, CancellationToken cancellationToken);
     Task<PagedList<EmployeeDto>> GetAllEmployeeAsync(
         string? searchTerm,
         string? sortColumn,

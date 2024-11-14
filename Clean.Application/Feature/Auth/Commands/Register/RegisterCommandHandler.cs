@@ -38,61 +38,79 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResul
         CancellationToken cancellationToken
     )
     {
-        var validator = new RegisterCommandValidator();
-        var result = await validator.ValidateAsync(request.RegisterEmployeeDto, cancellationToken);
-        if (!result.IsValid)
+        try
         {
-            var errors = result
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
-                .ToList();
-            return BaseResult<int>.Failure(errors);
-        }
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        if (
-            !await _roleManager.RoleExistsAsync(
-                UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name
-            )
-        )
-            return BaseResult<int>.Failure(
-                new Error(
-                    400,
-                    "Role",
-                    $"Role with id '{request.RegisterEmployeeDto.UserRoleId}' was not found."
+            var validator = new RegisterCommandValidator();
+            var result = await validator.ValidateAsync(
+                request.RegisterEmployeeDto,
+                cancellationToken
+            );
+            if (!result.IsValid)
+            {
+                var errors = result
+                    .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
+                    .ToList();
+                return BaseResult<int>.Failure(errors);
+            }
+            var emailExist = await _employeeRepository.EmailExistIncludeDeletedAsync(
+                request.RegisterEmployeeDto.Email,
+                cancellationToken
+            );
+            if (emailExist)
+                return BaseResult<int>.Failure(
+                    EmployeeErrors.EmailNotUnique(request.RegisterEmployeeDto.Email)
+                );
+            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            if (
+                !await _roleManager.RoleExistsAsync(
+                    UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name
                 )
+            )
+                return BaseResult<int>.Failure(
+                    new Error(
+                        400,
+                        "Role",
+                        $"Role with id '{request.RegisterEmployeeDto.UserRoleId}' was not found."
+                    )
+                );
+
+            var employee = _mapper.Map<GeneralEmployee>(request.RegisterEmployeeDto);
+            var appUser = new AppUser { UserName = employee.Name, Email = employee.Email, };
+
+            var validationResult = await _userManager.CreateAsync(
+                appUser,
+                request.RegisterEmployeeDto.Password
             );
 
-        var employee = _mapper.Map<GeneralEmployee>(request.RegisterEmployeeDto);
-        var appUser = new AppUser { UserName = employee.Name, Email = employee.Email, };
+            if (!validationResult.Succeeded)
+            {
+                var errors = validationResult
+                    .Errors.Select(e => new Error(400, e.Code, e.Description))
+                    .ToList();
+                return BaseResult<int>.Failure(errors);
+            }
 
-        var validationResult = await _userManager.CreateAsync(
-            appUser,
-            request.RegisterEmployeeDto.Password
-        );
+            var role = UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name;
+            await _userManager.AddToRoleAsync(appUser, role);
 
-        if (!validationResult.Succeeded)
-        {
-            var errors = validationResult
-                .Errors.Select(e => new Error(400, e.Code, e.Description))
-                .ToList();
-            return BaseResult<int>.Failure(errors);
+            var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail,
+                cancellationToken
+            );
+            employee.SetAddedBy(currentUser!.Id);
+            employee.SetAddedOn(DateTime.UtcNow);
+            employee.SetAppUserId(appUser.Id);
+            appUser.SetPasswordExpire(true);
+
+            await _employeeRepository.AddEmployeeAsync(employee, cancellationToken);
+
+            transaction.Complete();
+
+            return BaseResult<int>.Ok(employee.Id);
         }
-
-        var role = UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name;
-        await _userManager.AddToRoleAsync(appUser, role);
-
-        var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
-            _currentUserService.UserEmail,
-            cancellationToken
-        );
-        employee.SetAddedBy(currentUser!.Id);
-        employee.SetAddedOn(DateTime.UtcNow);
-        employee.SetAppUserId(appUser.Id);
-        appUser.SetPasswordExpire(true);
-
-        await _employeeRepository.AddEmployeeAsync(employee, cancellationToken);
-
-        transaction.Complete();
-
-        return BaseResult<int>.Ok(employee.Id);
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

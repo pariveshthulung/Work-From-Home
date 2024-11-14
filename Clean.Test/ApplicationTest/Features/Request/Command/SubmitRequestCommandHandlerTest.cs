@@ -242,7 +242,7 @@ public class SubmitRequestCommandHandlerTest
         _employeeRepositoryMock
             .Setup(x =>
                 x.GetEmployeeByEmailAsync(
-                    _currentUserMock.Object.UserEmail,
+                    _currentUserMock.Object.UserEmail!,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -319,7 +319,7 @@ public class SubmitRequestCommandHandlerTest
         _employeeRepositoryMock
             .Setup(x =>
                 x.GetEmployeeByEmailAsync(
-                    _currentUserMock.Object.UserEmail,
+                    _currentUserMock.Object.UserEmail!,
                     It.IsAny<CancellationToken>()
                 )
             )

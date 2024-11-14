@@ -28,7 +28,8 @@ export default function AddEmployee() {
     e.preventDefault();
     if (
       document.getElementById("password").value ==
-      document.getElementById("confirm_password").value
+        document.getElementById("confirm_password").value &&
+      document.getElementById("confirm_password").value.length !== 0
     ) {
       document.getElementById("message").style.color = "green";
       document.getElementById("message").innerHTML = "matching";
@@ -129,7 +130,7 @@ export default function AddEmployee() {
                           </div>
                           <div className="row d-flex justify-content-center">
                             <div className="form-group col-md-5 mb-4">
-                              <label htmlFor="dropdown">Select a Role:</label>
+                              <label htmlFor="dropdown">Select a Role</label>
                               <select
                                 id="dropdown"
                                 className="form-control"

@@ -55,12 +55,12 @@ public class EmailService : IEmailService
             $"Your request has been submitted from '{request.FromDate}' to {request.ToDate}'.";
 
         await _fluentEmail
-            .To(requestedBy.Email)
+            .To(requestedBy!.Email)
             .Subject($"Request Submitted for '{requestType}'")
             .Body(body)
             .SendAsync();
         await _fluentEmail
-            .To(requestedTo.Email)
+            .To(requestedTo!.Email)
             .Subject($"Request Submitted for '{requestType}'")
             .Body(body)
             .SendAsync();

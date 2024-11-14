@@ -23,7 +23,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
             await context.SaveChangesAsync(cancellationToken);
             return employee;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -56,7 +56,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
                 .Include(x => x.AppUser)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
-                .ThenInclude(y => y.ApprovalStatus)
+                .ThenInclude(y => y!.ApprovalStatus)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.RequestedToEmployee)
                 .Include(x => x.Requests)
@@ -171,7 +171,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
                 .Include(x => x.UserRole)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
-                .ThenInclude(y => y.ApprovalStatus)
+                .ThenInclude(y => y!.ApprovalStatus)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.RequestedToEmployee)
                 .Include(x => x.Requests)
@@ -204,7 +204,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
                 .Employees.Include(x => x.UserRole)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
-                .ThenInclude(y => y.ApprovalStatus)
+                .ThenInclude(y => y!.ApprovalStatus)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.RequestedToEmployee)
                 .Include(x => x.Requests)
@@ -246,5 +246,13 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
         {
             throw;
         }
+    }
+
+    public async Task<bool> EmailExistIncludeDeletedAsync(
+        string email,
+        CancellationToken cancellationToken
+    )
+    {
+        return await context.Employees.IgnoreQueryFilters().AnyAsync(x => x.Email == email);
     }
 }

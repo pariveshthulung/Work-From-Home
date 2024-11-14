@@ -30,7 +30,7 @@ namespace Clean.Domain.Entities
             Email = ValidationGuard.ValidateEmail(email);
             PhoneNumber = ValidationGuard.ValidatePhoneNumber(phoneNumber);
             UserRoleId = userRoleId;
-            // Address = address;
+            Address = address;
         }
 
         public void Update(string name, string email, string phoneNumber, int userRoleId)
