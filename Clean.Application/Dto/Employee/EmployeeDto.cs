@@ -12,6 +12,8 @@ public record EmployeeDto : BaseDto
     public int UserRoleId { get; init; }
     public string UserRole { get; init; } = default!;
     public string PhoneNumber { get; init; } = default!;
+    public int ManagerId { get; init; } = default!;
+    public string ManagerEmail { get; init; } = default!;
     public AddressDto Address { get; init; } = default!;
     public List<RequestDto> Requests { get; init; } = default!;
 }

@@ -8,10 +8,19 @@ namespace Clean.Application.Persistence.Contract;
 public interface IEmployeeRepository
 {
     Task<Employee?> GetEmployeeByGuidIdAsync(Guid guidId, CancellationToken cancellationToken);
-    Task<List<string>?> GetManagerEmailAsync(CancellationToken cancellationToken);
+    Task<string?> GetEmployeeManagerEmailAsync(string email, CancellationToken cancellationToken);
     Task<bool> EmailExistAsync(string email, CancellationToken cancellationToken);
     Task<bool> EmailExistIncludeDeletedAsync(string email, CancellationToken cancellationToken);
     Task<PagedList<EmployeeDto>> GetAllEmployeeAsync(
+        string? searchTerm,
+        string? sortColumn,
+        string? sortOrder,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken
+    );
+    Task<PagedList<EmployeeDto>> GetAllEmployeeAsync(
+        int currentUserId,
         string? searchTerm,
         string? sortColumn,
         string? sortOrder,

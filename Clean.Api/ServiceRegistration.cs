@@ -84,7 +84,6 @@ namespace Clean.Api.Dependency
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WorkFromHome", Version = "v1" });
 
-                // OAuth2 Configuration for Okta
                 c.AddSecurityDefinition(
                     "oauth2",
                     new OpenApiSecurityScheme
@@ -96,11 +95,11 @@ namespace Clean.Api.Dependency
                             {
                                 AuthorizationUrl = new Uri(
                                     // $"{configuration["Okta:OktaDomain"]}/oauth2/default/v1/authorize"
-                                    "https://dev-93378940.okta.com/oauth2/ausjszru5jA7nhqRh5d7/v1/authorize"
+                                    $"{OktaSettings?.OktaDomain}/oauth2/ausjszru5jA7nhqRh5d7/v1/authorize"
                                 ),
                                 TokenUrl = new Uri(
                                     // $"{configuration["Okta:OktaDomain"]}/oauth2/default/v1/token"
-                                    "https://dev-93378940.okta.com/oauth2/ausjszru5jA7nhqRh5d7/v1/token"
+                                    $"{OktaSettings?.OktaDomain}/oauth2/ausjszru5jA7nhqRh5d7/v1/token"
                                 ),
                                 Scopes = new Dictionary<string, string>
                                 {

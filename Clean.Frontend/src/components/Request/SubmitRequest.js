@@ -1,27 +1,39 @@
-import { useEffect, useState, useLayoutEffect } from "react";
+import { useEffect, useState, useLayoutEffect, useContext } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import httpClient from "../Api/HttpClient";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAuth from "../hooks/useAuth";
+import AuthContext from "../../context/AuthProvider";
 
 export default function SubmitRequest() {
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
-  const [managersEmail, setManagersEmail] = useState([]);
+  const [managerEmail, setManagerEmail] = useState("");
   const [fromDate, setFromDate] = useState();
   const [toDate, setToDate] = useState();
+  const [loading, setLoading] = useState(true);
+
+  const authContext = useContext(AuthContext);
+  const { auth } = useAuth(AuthContext);
 
   const navigate = useNavigate();
 
-  useEffect((e) => {
-    fetch("https://localhost:7058/api/Employee/getManagersEmail")
-      .then((response) => response.json())
-      .then((data) => {
-        setManagersEmail(data);
-      })
-      .catch((e) => console.log(e));
-  }, []);
+  useEffect(() => {
+    async function fetchManagerEmail() {
+      try {
+        var response = await httpClient
+          .get(`/api/Employee/getEmployeeManagerEmail?email=${auth.email}`)
+          .finally(setLoading(false));
+        console.log(response.data);
+        setManagerEmail(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchManagerEmail();
+  }, [auth]);
 
   function handleSubmitRequest(e) {
     e.preventDefault();
@@ -29,7 +41,7 @@ export default function SubmitRequest() {
     const postRequest = async () => {
       try {
         await httpClient.post("/api/Request/submitrequest", {
-          requestedToEmail: email,
+          requestedToEmail: managerEmail,
           toDate: toDate,
           fromDate: fromDate,
           description: description,
@@ -50,7 +62,7 @@ export default function SubmitRequest() {
     };
     postRequest();
   }
-  return (
+  return !loading ? (
     <section className="vh-100 gradient-custom">
       <div className="container py-5 h-100">
         <ToastContainer />
@@ -60,11 +72,11 @@ export default function SubmitRequest() {
               className="card bg-light text-dark"
               style={{ borderRadius: "1rem" }}
             >
-              <div className="card-body p-5 text-center">
+              <div className="card-body p-5 ">
                 <div className="container">
                   <ToastContainer />
 
-                  <div className="row justify-content-center">
+                  <div className="row">
                     <div className="col-12 text-center mb-4">
                       <h1>Submit Requests</h1>
                     </div>
@@ -103,7 +115,7 @@ export default function SubmitRequest() {
                             <label htmlFor="dropdown" className="mb-2">
                               Request to (email)
                             </label>
-                            <select
+                            {/* <select
                               id="dropdown"
                               value={email}
                               className="form-control"
@@ -111,12 +123,18 @@ export default function SubmitRequest() {
                               required
                             >
                               <option value="">Select an Email</option>
-                              {managersEmail.map((item, i) => (
+                              {managerEmail.map((item, i) => (
                                 <option key={i} value={item}>
                                   {item}
                                 </option> // Assuming each item has id, value, and name
                               ))}
-                            </select>
+                            </select> */}
+                            <input
+                              type="text"
+                              value={managerEmail}
+                              className="form-control"
+                              disabled
+                            />
                           </div>
                         </div>
                         <div className="form-group mb-4">
@@ -131,20 +149,21 @@ export default function SubmitRequest() {
                           />
                         </div>
                         <hr className="my-4" />
-
-                        <button
-                          type="submit"
-                          onClick={handleSubmitRequest}
-                          className="btn btn-primary my-3"
-                        >
-                          Submit Request
-                        </button>
-                        <button
-                          onClick={() => navigate("/listRequest")}
-                          className="btn btn-secondary my-3 mx-4"
-                        >
-                          Back
-                        </button>
+                        <div className="d-flex flex-column justify-content-center ">
+                          <button
+                            type="submit"
+                            onClick={handleSubmitRequest}
+                            className="btn btn-primary my-3"
+                          >
+                            Submit Request
+                          </button>
+                          <button
+                            onClick={() => navigate("/listRequest")}
+                            className="btn btn-secondary my-3"
+                          >
+                            Back
+                          </button>
+                        </div>
                       </form>
                     </div>
                   </div>
@@ -155,5 +174,7 @@ export default function SubmitRequest() {
         </div>
       </div>
     </section>
+  ) : (
+    <p>loading...</p>
   );
 }

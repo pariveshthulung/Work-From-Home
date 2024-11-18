@@ -4,7 +4,7 @@ using Clean.Application.Feature.Employees.Requests.Queries;
 using Clean.Application.Helper;
 using Clean.Application.Persistence.Contract;
 using Clean.Application.Wrappers;
-using Clean.Domain.Entities;
+using Clean.Domain.Enums;
 using MediatR;
 
 namespace Clean.Application.Feature.Employees.Handlers.Queries;
@@ -14,11 +14,17 @@ public class GetEmployeeListQueryHandler
 {
     private readonly IEmployeeRepository _employeeRepo;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetEmployeeListQueryHandler(IEmployeeRepository employeeRepository, IMapper mapper)
+    public GetEmployeeListQueryHandler(
+        IEmployeeRepository employeeRepository,
+        IMapper mapper,
+        ICurrentUserService currentUserService
+    )
     {
         _employeeRepo = employeeRepository;
         _mapper = mapper;
+        _currentUserService = currentUserService;
     }
 
     public async Task<BaseResult<PagedList<EmployeeDto>>> Handle(
@@ -28,7 +34,12 @@ public class GetEmployeeListQueryHandler
     {
         try
         {
+            var currentUser = await _employeeRepo.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail!,
+                cancellationToken
+            );
             var employees = await _employeeRepo.GetAllEmployeeAsync(
+                currentUser!.Id,
                 request.SearchTerm,
                 request.SortColumn,
                 request.SortOrder,
@@ -36,6 +47,7 @@ public class GetEmployeeListQueryHandler
                 request.PageSize,
                 cancellationToken
             );
+
             return BaseResult<PagedList<EmployeeDto>>.Ok(employees);
         }
         catch (Exception e)

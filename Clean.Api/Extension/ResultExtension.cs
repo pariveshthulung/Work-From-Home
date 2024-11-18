@@ -1,5 +1,3 @@
-using System;
-using System.Net;
 using Clean.Application.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 

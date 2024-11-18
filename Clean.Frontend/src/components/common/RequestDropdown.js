@@ -24,7 +24,7 @@ const RequestDropdown = ({ active, setActive }) => {
             : "nav-link dropdown-toggle"
         }
       >
-        Request
+        <strong>Requests</strong>
       </a>
       <ul className="dropdown-menu" aria-labelledby="dropdownMenuLink">
         <li>

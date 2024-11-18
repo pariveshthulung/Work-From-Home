@@ -60,6 +60,23 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResul
                 return BaseResult<int>.Failure(
                     EmployeeErrors.EmailNotUnique(request.RegisterEmployeeDto.Email)
                 );
+            var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail!,
+                cancellationToken
+            );
+            if (
+                !CheckRegisterPermission(
+                    currentUser!.UserRoleId,
+                    request.RegisterEmployeeDto.UserRoleId
+                )
+            )
+                return BaseResult<int>.Failure(
+                    new Error(
+                        403,
+                        "Forbidden",
+                        $"You dont have permission to add new employee as {UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name}"
+                    )
+                );
             using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             if (
                 !await _roleManager.RoleExistsAsync(
@@ -93,13 +110,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResul
             var role = UserRoleEnum.FromId(request.RegisterEmployeeDto.UserRoleId).Name;
             await _userManager.AddToRoleAsync(appUser, role);
 
-            var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
-                _currentUserService.UserEmail,
-                cancellationToken
-            );
             employee.SetAddedBy(currentUser!.Id);
             employee.SetAddedOn(DateTime.UtcNow);
             employee.SetAppUserId(appUser.Id);
+            employee.SetManagerId(currentUser.Id);
             appUser.SetPasswordExpire(true);
 
             await _employeeRepository.AddEmployeeAsync(employee, cancellationToken);
@@ -112,5 +126,29 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResul
         {
             throw;
         }
+    }
+
+    public bool CheckRegisterPermission(int currentUserRole, int newUserRole)
+    {
+        if (currentUserRole == UserRoleEnum.SuperAdmin.Id)
+        {
+            return true;
+        }
+        if (currentUserRole == UserRoleEnum.Admin.Id)
+            if (newUserRole == UserRoleEnum.SuperAdmin.Id || newUserRole == UserRoleEnum.Admin.Id)
+            {
+                return false;
+            }
+        if (currentUserRole == UserRoleEnum.Manager.Id)
+            if (
+                newUserRole == UserRoleEnum.SuperAdmin.Id
+                || newUserRole == UserRoleEnum.Admin.Id
+                || newUserRole == UserRoleEnum.Manager.Id
+            )
+            {
+                return false;
+            }
+
+        return true;
     }
 }

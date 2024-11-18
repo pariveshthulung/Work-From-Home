@@ -8,10 +8,6 @@ builder.Services.AddPresentationLayer(builder.Configuration);
 builder.Services.AddInfrastructureLayer();
 builder.Services.AddApplicationLayer();
 
-// builder.Services.AddDomainLayer();
-
-// builder.Services.AddInfrastructureConfig();
-
 builder.Services.AddMvc();
 
 builder.Services.AddCors(options =>

@@ -8,7 +8,8 @@ const UserProfileComponent = () => {
 
   return (
     <div className="mx-3">
-      <div className="dropdown dropstart">
+      <div className="dropdown">
+        <span className="mx-2">{authContext.auth.name}</span>
         <svg
           href="#"
           role="button"
@@ -40,6 +41,7 @@ const UserProfileComponent = () => {
               className="dropdown-item"
               onClick={() => {
                 window.localStorage.clear();
+                // authContext.setAuth(null);
                 navigate("/login");
               }}
             >

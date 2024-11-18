@@ -5,9 +5,13 @@ import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../../context/AuthProvider";
+import useAuth from "../hooks/useAuth";
 
 export default function AddEmployee() {
   const navigate = useNavigate();
+  const authContext = useAuth(AuthContext);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState(0);
@@ -47,6 +51,7 @@ export default function AddEmployee() {
           "https://localhost:7058/api/Enum/getRoles"
         );
         setRoles(response.data);
+        console.log(roles);
       } catch (err) {
         toast.error("Roles: could not fetch roles.");
       }
@@ -71,6 +76,7 @@ export default function AddEmployee() {
           },
         },
       });
+      console.log(selectedRole);
       console.log(response.data);
       navigate("/", {
         state: { showToast: "Employee added successfully!!!" },
@@ -140,11 +146,44 @@ export default function AddEmployee() {
                                 }
                               >
                                 <option value="">Select an option</option>
-                                {roles.map((role) => (
-                                  <option key={role.id} value={role.id}>
-                                    {role.name}
-                                  </option>
-                                ))}
+                                {authContext.auth.userRole === "Admin" ||
+                                authContext.auth.userRole === "SuperAdmin" ||
+                                authContext.auth.userRole === "Ceo"
+                                  ? authContext.auth.userRole === "SuperAdmin"
+                                    ? roles
+                                        .filter(
+                                          (role) => role.name != "SuperAdmin"
+                                        )
+                                        .map((role) => (
+                                          <option key={role.id} value={role.id}>
+                                            {role.name}
+                                          </option>
+                                        ))
+                                    : roles
+                                        .filter(
+                                          (role) =>
+                                            role.name == "Manager" ||
+                                            // role.name == "Ceo" ||
+                                            role.name == "Intern" ||
+                                            role.name == "Developer"
+                                        )
+                                        .map((role) => (
+                                          <option key={role.id} value={role.id}>
+                                            {role.name}
+                                          </option>
+                                        ))
+                                  : roles
+                                      .filter(
+                                        (role) =>
+                                          role.name == "Intern" ||
+                                          role.name == "Developer"
+                                      )
+                                      .map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                          {role.name}
+                                        </option>
+                                      ))}
+                                ;
                               </select>
                             </div>
                             <div className="form-group col-md-5 mb-4">

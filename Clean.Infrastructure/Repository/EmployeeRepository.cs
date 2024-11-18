@@ -53,6 +53,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
             return await context
                 .Employees.Include(e => e.Address)
                 .Include(x => x.UserRole)
+                .Include(x => x.Manager)
                 .Include(x => x.AppUser)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
@@ -77,6 +78,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
                 .Employees.Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
                 .Include(x => x.AppUser)
+                .Include(x => x.Manager)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
@@ -169,6 +171,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
             }
             var productDtoResponse = employees
                 .Include(x => x.UserRole)
+                .Include(x => x.Manager)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
                 .ThenInclude(y => y!.ApprovalStatus)
@@ -187,7 +190,7 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
 
             return pagedList;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -201,7 +204,8 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
         try
         {
             var emp = await context
-                .Employees.Include(x => x.UserRole)
+                .Employees.Include(x => x.Manager)
+                .Include(x => x.UserRole)
                 .Include(x => x.Requests)
                 .ThenInclude(x => x.Approval)
                 .ThenInclude(y => y!.ApprovalStatus)
@@ -233,14 +237,19 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
         }
     }
 
-    public async Task<List<string>?> GetManagerEmailAsync(CancellationToken cancellationToken)
+    public async Task<string?> GetEmployeeManagerEmailAsync(
+        string email,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
             return await context
-                .Employees.Where(x => x.UserRoleId == UserRoleEnum.Manager.Id)
-                .Select(x => x.Email)
-                .ToListAsync(cancellationToken);
+                .Employees.Include(x => x.Manager)
+                .Where(x => x.Email == email)
+                .Select(x => x.Manager.Email)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
         }
         catch (Exception e)
         {
@@ -254,5 +263,88 @@ public class EmployeeRepository(ApplicationDbContext context, IMapper mapper) : 
     )
     {
         return await context.Employees.IgnoreQueryFilters().AnyAsync(x => x.Email == email);
+    }
+
+    public async Task<PagedList<EmployeeDto>> GetAllEmployeeAsync(
+        int currentUserId,
+        string? searchTerm,
+        string? sortColumn,
+        string? sortOrder,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var currentUserRoleId = await context
+                .Employees.Where(x => x.Id == currentUserId)
+                .Select(x => x.UserRoleId)
+                .FirstOrDefaultAsync();
+            IQueryable<Employee> employees;
+            if (currentUserRoleId == UserRoleEnum.SuperAdmin.Id)
+            {
+                employees = context.Employees.AsQueryable();
+            }
+            else if (currentUserRoleId == UserRoleEnum.Admin.Id)
+            {
+                employees = context
+                    .Employees.Where(x => x.UserRoleId != UserRoleEnum.SuperAdmin.Id)
+                    .AsQueryable();
+            }
+            else
+            {
+                employees = context
+                    .Employees.Where(x => x.ManagerId == currentUserId)
+                    .AsQueryable();
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                employees = employees.Where(x =>
+                    x.Name.Contains(searchTerm) || x.Email.Contains(searchTerm)
+                );
+            }
+
+            Expression<Func<Employee, object>> keySelector = sortColumn?.ToLower() switch
+            {
+                "email" => employee => employee.Email,
+                "name" => employee => employee.Name,
+                _ => employee => employee.Id
+            };
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                employees = employees.OrderByDescending(keySelector);
+            }
+            else
+            {
+                employees = employees.OrderBy(keySelector);
+            }
+            var productDtoResponse = employees
+                .Include(x => x.UserRole)
+                .Include(x => x.Manager)
+                .Include(x => x.Requests)
+                .ThenInclude(x => x.Approval)
+                .ThenInclude(y => y!.ApprovalStatus)
+                .Include(x => x.Requests)
+                .ThenInclude(x => x.RequestedToEmployee)
+                .Include(x => x.Requests)
+                .ThenInclude(x => x.RequestedType)
+                .AsNoTracking()
+                .Select(x => mapper.Map<EmployeeDto>(x));
+
+            var pagedList = await PagedList<EmployeeDto>.CreateAsync(
+                productDtoResponse,
+                page,
+                pageSize
+            );
+
+            return pagedList;
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

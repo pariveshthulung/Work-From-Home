@@ -20,9 +20,9 @@ namespace Clean.Api.Controller
     public class EmployeeController(IMediator mediator) : BaseController
     {
         #region GetMethod
-        // [Authorize(Policy = "Adminstrator")]
+        [Authorize(Policy = "Adminstrator")]
         [HttpGet("getAllEmployee")]
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [ProducesResponseType(typeof(PagedList<EmployeeDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -82,11 +82,9 @@ namespace Clean.Api.Controller
             {
                 var request = new LoggedUserProfileQuery();
                 var response = await mediator.Send(request, cancellationToken);
-
-                if (!response.Success)
-                    return response.ToProblemDetail();
-
-                return Ok(response.Data);
+                if (response.Success)
+                    return Ok(response.Data);
+                return response.ToProblemDetail();
             }
             catch (Exception ex)
             {
@@ -159,13 +157,19 @@ namespace Clean.Api.Controller
         }
 
         [AllowAnonymous]
-        [HttpGet("getManagersEmail")]
+        [HttpGet("getEmployeeManagerEmail")]
         [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetManagersEmail(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetEmployeeManagerEmail(
+            string email,
+            CancellationToken cancellationToken
+        )
         {
-            var response = await mediator.Send(new GetManagersEmailQuery(), cancellationToken);
+            var response = await mediator.Send(
+                new GetEmployeeManagerEmailQuery { Email = email },
+                cancellationToken
+            );
             if (!response.Success)
                 return response.ToProblemDetail();
 

@@ -38,8 +38,9 @@ export default function ChangePassword() {
       console.log(response);
       const token = response.data;
       console.log(token);
-      localStorage.setItem("accessToken", token.accessToken);
-      localStorage.setItem("refreshToken", token.refreshToken);
+      localStorage.clear();
+      // localStorage.setItem("accessToken", token.accessToken);
+      // localStorage.setItem("refreshToken", token.refreshToken);
       navigate("/login", {
         state: { showToast: "Password changed successfull!!!" },
       });

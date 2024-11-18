@@ -106,7 +106,7 @@ export default function EmployeeDetails() {
                                     class={"nav-link active"}
                                     aria-current="page"
                                   >
-                                    Details
+                                    <strong>Details</strong>
                                   </a>
                                 </li>
                               </ul>
@@ -118,32 +118,58 @@ export default function EmployeeDetails() {
                           <table class="table">
                             <tbody>
                               <tr>
-                                <td>Name</td>
+                                <td>
+                                  <strong>Name</strong>
+                                </td>
                                 <td>{employee.name}</td>
                               </tr>
                               <tr>
-                                <td>Email</td>
+                                <td>
+                                  <strong>Email</strong>
+                                </td>
                                 <td>{employee.email}</td>
                               </tr>
                               <tr>
-                                <td>Role</td>
+                                <td>
+                                  <strong>UserRole</strong>
+                                </td>
+
                                 <td>{employee.userRole}</td>
                               </tr>
                               <tr>
-                                <td>PhoneNumber</td>
+                                <td>
+                                  <strong>PhoneNumber</strong>
+                                </td>
+
                                 <td>{employee.phoneNumber}</td>
                               </tr>
                               <tr>
-                                <td>City</td>
+                                <td>
+                                  <strong>City</strong>
+                                </td>
+
                                 <td>{employee.address.city}</td>
                               </tr>
                               <tr>
-                                <td>Street</td>
+                                <td>
+                                  <strong>Street</strong>
+                                </td>
+
                                 <td>{employee.address.street}</td>
                               </tr>
                               <tr>
-                                <td>PostalCode</td>
+                                <td>
+                                  <strong>PostalCode</strong>
+                                </td>
+
                                 <td>{employee.address.postalCode}</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <strong>Manager</strong>
+                                </td>
+
+                                <td>{employee.managerEmail}</td>
                               </tr>
                             </tbody>
                           </table>

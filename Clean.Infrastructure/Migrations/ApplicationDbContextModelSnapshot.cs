@@ -146,7 +146,7 @@ namespace Clean.Infrastructure.Migrations
                     b.HasIndex("RequestId")
                         .IsUnique();
 
-                    b.ToTable("Approvals");
+                    b.ToTable("Approvals", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Domain.Entities.ApprovalStatus", b =>
@@ -163,7 +163,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApprovalStatuses");
+                    b.ToTable("ApprovalStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Domain.Entities.Employee", b =>
@@ -228,7 +228,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasIndex("UserRoleId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
 
                     b.HasDiscriminator().HasValue("Employee");
 
@@ -298,7 +298,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasIndex("RequestedTypeId");
 
-                    b.ToTable("Requests");
+                    b.ToTable("Requests", (string)null);
 
                     b.HasDiscriminator().HasValue("Request");
 
@@ -319,7 +319,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RequestedTypes");
+                    b.ToTable("RequestedTypes", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Domain.Entities.StoreProcedure.GetAllEmployees", b =>
@@ -362,7 +362,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GetAllEmployees");
+                    b.ToTable("GetAllEmployees", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Domain.Entities.UserRole", b =>
@@ -459,7 +459,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeDetails");
+                    b.ToTable("EmployeeDetails", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Domain.Entities.View.SqlInjection", b =>
@@ -505,7 +505,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SqlInjections");
+                    b.ToTable("SqlInjections", (string)null);
                 });
 
             modelBuilder.Entity("Clean.Infrastructure.OutBox.OutBoxMessage", b =>
@@ -533,7 +533,7 @@ namespace Clean.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OutBoxMessages");
+                    b.ToTable("OutBoxMessages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -694,7 +694,7 @@ namespace Clean.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Clean.Domain.Entities.Address", "Address", b1 =>
+                    b.OwnsOne("Clean.Domain.Entities.Employee.Address#Clean.Domain.Entities.Address", "Address", b1 =>
                         {
                             b1.Property<int>("EmployeeId")
                                 .HasColumnType("int");
@@ -713,7 +713,7 @@ namespace Clean.Infrastructure.Migrations
 
                             b1.HasKey("EmployeeId");
 
-                            b1.ToTable("Employees");
+                            b1.ToTable("Employees", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("EmployeeId");

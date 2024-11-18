@@ -12,7 +12,7 @@ public class PagedList<T>
         TotalCount = totalCount;
     }
 
-    public List<T> Items { get; }
+    public List<T> Items { get; set; }
     public int Page { get; }
     public int PageSize { get; }
     public int TotalCount { get; }

@@ -9,6 +9,8 @@ namespace Clean.Domain.Entities
         public int UserRoleId { get; private set; }
         public UserRole? UserRole { get; private set; }
         public string PhoneNumber { get; private set; } = default!;
+        public int? ManagerId { get; private set; } = default!;
+        public Employee Manager { get; private set; } = default!;
 
         public Address? Address { get; set; }
         private List<Request> _request = [];
@@ -95,6 +97,11 @@ namespace Clean.Domain.Entities
         public void SetAppUser(AppUser appUser)
         {
             AppUser = appUser;
+        }
+
+        public void SetManagerId(int managerId)
+        {
+            ManagerId = managerId;
         }
     }
 }
