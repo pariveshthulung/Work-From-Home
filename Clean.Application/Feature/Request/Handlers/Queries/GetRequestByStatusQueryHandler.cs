@@ -25,18 +25,25 @@ public class GetRequestByStatusQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var employees = await _employeeRepository.GetAllEmployeeAsync(
-            request.Query.SearchTerm,
-            request.Query.SortColumn,
-            request.Query.SortOrder,
-            request.Query.PageNumber,
-            request.Query.PageSize,
-            cancellationToken
-        );
-        var requests = employees
-            .Items.SelectMany(x => x.Requests)
-            .Where(x => x.RequestedTypeId == request.StatusId)
-            .ToList();
-        return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+        try
+        {
+            var employees = await _employeeRepository.GetAllEmployeeAsync(
+                request.Query.SearchTerm,
+                request.Query.SortColumn,
+                request.Query.SortOrder,
+                request.Query.PageNumber,
+                request.Query.PageSize,
+                cancellationToken
+            );
+            var requests = employees
+                .Items.SelectMany(x => x.Requests)
+                .Where(x => x.RequestedTypeId == request.StatusId)
+                .ToList();
+            return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

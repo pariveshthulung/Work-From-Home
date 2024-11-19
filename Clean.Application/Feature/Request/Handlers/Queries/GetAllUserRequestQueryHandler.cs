@@ -25,14 +25,21 @@ public class GetAllUserRequestQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var employee = await _employeeRepository.GetEmployeeByEmailAsync(
-            request.Email,
-            cancellationToken
-        );
-        if (employee is null)
-            return BaseResult<List<RequestDto>>.Failure(EmployeeErrors.NotFound());
-        return BaseResult<List<RequestDto>>.Ok(
-            _mapper.Map<List<RequestDto>>(employee.Requests.ToList())
-        );
+        try
+        {
+            var employee = await _employeeRepository.GetEmployeeByEmailAsync(
+                request.Email,
+                cancellationToken
+            );
+            if (employee is null)
+                return BaseResult<List<RequestDto>>.Failure(EmployeeErrors.NotFound());
+            return BaseResult<List<RequestDto>>.Ok(
+                _mapper.Map<List<RequestDto>>(employee.Requests.ToList())
+            );
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 }

@@ -32,31 +32,38 @@ public class RegisterEmployeeCommandHandler
         CancellationToken cancellationToken
     )
     {
-        var validator = new RegisterEmployeeDtoValidator(_employeeRepo);
-
-        var validatorResult = await validator.ValidateAsync(
-            request.RegisterEmployeeDto,
-            cancellationToken
-        );
-        if (!validatorResult.IsValid)
+        try
         {
-            var errors = validatorResult
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
-                .ToList();
-            return BaseResult<int>.Failure(errors);
-        }
-        var checkEmail = await _employeeRepo.EmailExistAsync(
-            request.RegisterEmployeeDto.Email,
-            cancellationToken
-        );
-        if (checkEmail)
-            return BaseResult<int>.Failure(
-                EmployeeErrors.EmailNotUnique(request.RegisterEmployeeDto.Email)
+            var validator = new RegisterEmployeeDtoValidator(_employeeRepo);
+
+            var validatorResult = await validator.ValidateAsync(
+                request.RegisterEmployeeDto,
+                cancellationToken
             );
+            if (!validatorResult.IsValid)
+            {
+                var errors = validatorResult
+                    .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage))
+                    .ToList();
+                return BaseResult<int>.Failure(errors);
+            }
+            var checkEmail = await _employeeRepo.EmailExistAsync(
+                request.RegisterEmployeeDto.Email,
+                cancellationToken
+            );
+            if (checkEmail)
+                return BaseResult<int>.Failure(
+                    EmployeeErrors.EmailNotUnique(request.RegisterEmployeeDto.Email)
+                );
 
-        var employee = _mapper.Map<Employee>(request.RegisterEmployeeDto);
-        employee = await _employeeRepo.AddEmployeeAsync(employee, cancellationToken);
+            var employee = _mapper.Map<Employee>(request.RegisterEmployeeDto);
+            employee = await _employeeRepo.AddEmployeeAsync(employee, cancellationToken);
 
-        return BaseResult<int>.Ok(employee!.Id);
+            return BaseResult<int>.Ok(employee!.Id);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

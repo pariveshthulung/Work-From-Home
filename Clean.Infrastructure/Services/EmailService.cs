@@ -19,7 +19,14 @@ public class EmailService : IEmailService
 
     public async Task SendEmailAsync(string toEmail, string subject, string body)
     {
-        await _fluentEmail.To(toEmail).Subject(subject).Body(body).SendAsync();
+        try
+        {
+            await _fluentEmail.To(toEmail).Subject(subject).Body(body).SendAsync();
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task SendRequestApprovedEmailAsync(
@@ -42,27 +49,34 @@ public class EmailService : IEmailService
         CancellationToken cancellationToken
     )
     {
-        var requestedBy = await _employeeRepo.GetEmployeeByIdAsync(
-            request.RequestedBy,
-            cancellationToken
-        );
-        var requestedTo = await _employeeRepo.GetEmployeeByIdAsync(
-            request.RequestedTo,
-            cancellationToken
-        );
-        var requestType = RequestTypeEnum.FromId(request.RequestedTypeId).Name;
-        var body =
-            $"Your request has been submitted from '{request.FromDate}' to {request.ToDate}'.";
+        try
+        {
+            var requestedBy = await _employeeRepo.GetEmployeeByIdAsync(
+                request.RequestedBy,
+                cancellationToken
+            );
+            var requestedTo = await _employeeRepo.GetEmployeeByIdAsync(
+                request.RequestedTo,
+                cancellationToken
+            );
+            var requestType = RequestTypeEnum.FromId(request.RequestedTypeId).Name;
+            var body =
+                $"Your request has been submitted from '{request.FromDate}' to {request.ToDate}'.";
 
-        await _fluentEmail
-            .To(requestedBy!.Email)
-            .Subject($"Request Submitted for '{requestType}'")
-            .Body(body)
-            .SendAsync();
-        await _fluentEmail
-            .To(requestedTo!.Email)
-            .Subject($"Request Submitted for '{requestType}'")
-            .Body(body)
-            .SendAsync();
+            await _fluentEmail
+                .To(requestedBy!.Email)
+                .Subject($"Request Submitted for '{requestType}'")
+                .Body(body)
+                .SendAsync();
+            await _fluentEmail
+                .To(requestedTo!.Email)
+                .Subject($"Request Submitted for '{requestType}'")
+                .Body(body)
+                .SendAsync();
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Clean.Domain.Entities
         private List<Request> _request = [];
         public IReadOnlyCollection<Request> Requests => _request;
         public int AppUserId { get; private set; }
-        public AppUser? AppUser { get; private set; }
+        public AppUser? AppUser { get; private set; } = default!;
 
         protected Employee() { }
 

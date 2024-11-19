@@ -32,33 +32,40 @@ public class GetAllRequestQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var employees = await _employeeRepo.GetAllEmployeeAsync(
-            query.Query.SearchTerm,
-            query.Query.SortColumn,
-            query.Query.SortOrder,
-            query.Query.PageNumber,
-            query.Query.PageSize,
-            cancellationToken
-        );
-        var currentUser = await _employeeRepo.GetEmployeeByEmailAsync(
-            _currentUserService.UserEmail!,
-            cancellationToken
-        );
-        if (
-            currentUser?.UserRoleId == UserRoleEnum.Admin.Id
-            || currentUser?.UserRoleId == UserRoleEnum.SuperAdmin.Id
-        )
+        try
         {
-            var requests = employees.Items?.SelectMany(x => x.Requests).ToList();
-            return BaseResult<List<RequestDto>>.Ok(requests);
+            var employees = await _employeeRepo.GetAllEmployeeAsync(
+                query.Query.SearchTerm,
+                query.Query.SortColumn,
+                query.Query.SortOrder,
+                query.Query.PageNumber,
+                query.Query.PageSize,
+                cancellationToken
+            );
+            var currentUser = await _employeeRepo.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail!,
+                cancellationToken
+            );
+            if (
+                currentUser?.UserRoleId == UserRoleEnum.Admin.Id
+                || currentUser?.UserRoleId == UserRoleEnum.SuperAdmin.Id
+            )
+            {
+                var requests = employees.Items?.SelectMany(x => x.Requests).ToList();
+                return BaseResult<List<RequestDto>>.Ok(requests);
+            }
+            else
+            {
+                var requests = employees
+                    .Items?.Where(x => x.ManagerId == currentUser!.Id)
+                    .SelectMany(x => x.Requests)
+                    .ToList();
+                return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+            }
         }
-        else
+        catch (Exception ex)
         {
-            var requests = employees
-                .Items?.Where(x => x.ManagerId == currentUser!.Id)
-                .SelectMany(x => x.Requests)
-                .ToList();
-            return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+            throw;
         }
     }
 }

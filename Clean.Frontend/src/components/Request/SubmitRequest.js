@@ -158,7 +158,7 @@ export default function SubmitRequest() {
                             Submit Request
                           </button>
                           <button
-                            onClick={() => navigate("/listRequest")}
+                            onClick={() => navigate("/userRequest")}
                             className="btn btn-secondary my-3"
                           >
                             Back

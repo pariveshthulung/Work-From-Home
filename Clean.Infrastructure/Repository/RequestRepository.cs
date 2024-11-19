@@ -73,7 +73,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
             );
             return requestPagedList;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -96,7 +96,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -134,7 +134,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -151,7 +151,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
             await context.SaveChangesAsync(cancellationToken);
             return request;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -164,7 +164,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
             context.Requests.Update(request);
             await context.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -187,7 +187,7 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
                 .AsNoTracking()
                 .ToListAsync(cancellationToken: cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -198,11 +198,18 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
         CancellationToken cancellationToken
     )
     {
-        return await context
-            .Requests.Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .FirstOrDefaultAsync(e => e.GuidId == guidId, cancellationToken);
+        try
+        {
+            return await context
+                .Requests.Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .FirstOrDefaultAsync(e => e.GuidId == guidId, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestByUserGuidIdAsync(
@@ -210,12 +217,19 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
         CancellationToken cancellationToken
     )
     {
-        return await context
-            .Requests.Where(x => x.Employee!.GuidId == userGuidId)
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            return await context
+                .Requests.Where(x => x.Employee!.GuidId == userGuidId)
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestByUserEmailAsync(
@@ -223,16 +237,23 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
         CancellationToken cancellationToken
     )
     {
-        var employeeId = await context
-            .Employees.Where(x => x.Email == email)
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-        return await context
-            .Requests.Where(r => r.EmployeeId == employeeId)
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            var employeeId = await context
+                .Employees.Where(x => x.Email == email)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            return await context
+                .Requests.Where(r => r.EmployeeId == employeeId)
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestSubmittedToUserAsync(
@@ -240,18 +261,25 @@ public class RequestRepository(ApplicationDbContext context, IMapper mapper) : I
         CancellationToken cancellationToken
     )
     {
-        var emailId = await context
-            .Employees.Where(x => x.Email.Equals(email))
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        return await context
-            .Requests.Where(x =>
-                x.RequestedTo == emailId
-                && x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
-            )
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            var emailId = await context
+                .Employees.Where(x => x.Email.Equals(email))
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            return await context
+                .Requests.Where(x =>
+                    x.RequestedTo == emailId
+                    && x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
+                )
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

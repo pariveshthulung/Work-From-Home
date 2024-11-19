@@ -30,44 +30,51 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
         CancellationToken cancellationToken
     )
     {
-        var validator = new UpdateEmployeeDtoValitator();
-        var validatorResult = await validator.ValidateAsync(
-            request.UpdateEmployeeDto,
-            cancellationToken
-        );
-        if (!validatorResult.IsValid)
+        try
         {
-            var errors = validatorResult
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
-                .ToList();
-            return BaseResult<Unit>.Failure(errors);
+            var validator = new UpdateEmployeeDtoValitator();
+            var validatorResult = await validator.ValidateAsync(
+                request.UpdateEmployeeDto,
+                cancellationToken
+            );
+            if (!validatorResult.IsValid)
+            {
+                var errors = validatorResult
+                    .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
+                    .ToList();
+                return BaseResult<Unit>.Failure(errors);
+            }
+            var employee = await _employeeRepo.GetEmployeeByGuidIdAsync(
+                request.UpdateEmployeeDto.Id,
+                cancellationToken
+            );
+            var existingEmployee = employee;
+
+            if (employee is null)
+                return BaseResult<Unit>.Failure(EmployeeErrors.NotFound());
+
+            var currentUser = await _employeeRepo.GetEmployeeByEmailAsync(
+                _currentUser.UserEmail,
+                cancellationToken
+            );
+
+            var addressDetails = _mapper.Map<Address>(request.UpdateEmployeeDto.Address);
+            employee.Update(
+                request.UpdateEmployeeDto.Name,
+                request.UpdateEmployeeDto.Email,
+                request.UpdateEmployeeDto.PhoneNumber,
+                request.UpdateEmployeeDto.UserRoleId
+            );
+
+            employee.UpdateEmployeeAddress(addressDetails);
+            employee.SetUpdatedBy(currentUser.Id);
+
+            await _employeeRepo.UpdateEmployeeAsync(employee, existingEmployee, cancellationToken);
+            return BaseResult<Unit>.Ok(Unit.Value);
         }
-        var employee = await _employeeRepo.GetEmployeeByGuidIdAsync(
-            request.UpdateEmployeeDto.Id,
-            cancellationToken
-        );
-        var existingEmployee = employee;
-
-        if (employee is null)
-            return BaseResult<Unit>.Failure(EmployeeErrors.NotFound());
-
-        var currentUser = await _employeeRepo.GetEmployeeByEmailAsync(
-            _currentUser.UserEmail,
-            cancellationToken
-        );
-
-        var addressDetails = _mapper.Map<Address>(request.UpdateEmployeeDto.Address);
-        employee.Update(
-            request.UpdateEmployeeDto.Name,
-            request.UpdateEmployeeDto.Email,
-            request.UpdateEmployeeDto.PhoneNumber,
-            request.UpdateEmployeeDto.UserRoleId
-        );
-
-        employee.UpdateEmployeeAddress(addressDetails);
-        employee.SetUpdatedBy(currentUser.Id);
-
-        await _employeeRepo.UpdateEmployeeAsync(employee, existingEmployee, cancellationToken);
-        return BaseResult<Unit>.Ok(Unit.Value);
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

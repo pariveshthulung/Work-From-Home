@@ -3,7 +3,6 @@ using Clean.Application.Persistence.Services;
 using Clean.Infrastructure.Backgrounds;
 using Clean.Infrastructure.Repository;
 using Clean.Infrastructure.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 

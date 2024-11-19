@@ -20,10 +20,17 @@ public class GetManagersEmailQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var emails = await _employeeRepository.GetEmployeeManagerEmailAsync(
-            request.Email,
-            cancellationToken
-        );
-        return BaseResult<string>.Ok(emails);
+        try
+        {
+            var emails = await _employeeRepository.GetEmployeeManagerEmailAsync(
+                request.Email,
+                cancellationToken
+            );
+            return BaseResult<string>.Ok(emails);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

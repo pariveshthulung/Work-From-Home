@@ -23,14 +23,21 @@ public class GetAllPagedListRequestDtoQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var requestDto = await _requestRepository.GetAllRequestAsync(
-            request.SearchTerm,
-            request.SortColumn,
-            request.SortOrder,
-            request.PageNumber,
-            request.PageSize,
-            cancellationToken
-        );
-        return BaseResult<PagedList<RequestDto>>.Ok(requestDto);
+        try
+        {
+            var requestDto = await _requestRepository.GetAllRequestAsync(
+                request.SearchTerm,
+                request.SortColumn,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize,
+                cancellationToken
+            );
+            return BaseResult<PagedList<RequestDto>>.Ok(requestDto);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

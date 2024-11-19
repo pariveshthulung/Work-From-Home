@@ -25,11 +25,18 @@ public class ApproveStatusEnumQueryHandler
         CancellationToken cancellationToken
     )
     {
-        List<ApprovalStatus> status = await _enumRepository.GetApprovalStatusAsync(
-            cancellationToken
-        );
-        return BaseResult<List<ApprovalStatusEnumDto>>.Ok(
-            _mapper.Map<List<ApprovalStatusEnumDto>>(status)
-        );
+        try
+        {
+            List<ApprovalStatus> status = await _enumRepository.GetApprovalStatusAsync(
+                cancellationToken
+            );
+            return BaseResult<List<ApprovalStatusEnumDto>>.Ok(
+                _mapper.Map<List<ApprovalStatusEnumDto>>(status)
+            );
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

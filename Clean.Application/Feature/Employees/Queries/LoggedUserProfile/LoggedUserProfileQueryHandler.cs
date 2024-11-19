@@ -31,12 +31,19 @@ public class LoggedUserProfileQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var employee = await _employeeRepo.GetEmployeeByEmailAsync(
-            _currentUserService.UserEmail,
-            cancellationToken
-        );
-        if (employee is null)
-            return BaseResult<EmployeeDto>.Failure(EmployeeErrors.Unauthorize());
-        return BaseResult<EmployeeDto>.Ok(_mapper.Map<EmployeeDto>(employee));
+        try
+        {
+            var employee = await _employeeRepo.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail,
+                cancellationToken
+            );
+            if (employee is null)
+                return BaseResult<EmployeeDto>.Failure(EmployeeErrors.Unauthorize());
+            return BaseResult<EmployeeDto>.Ok(_mapper.Map<EmployeeDto>(employee));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

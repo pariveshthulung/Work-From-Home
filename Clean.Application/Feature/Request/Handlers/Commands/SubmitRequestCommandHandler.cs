@@ -31,77 +31,77 @@ public class SubmitRequestCommandHandler : IRequestHandler<SubmitRequestCommand,
         CancellationToken cancellationToken
     )
     {
-        //validate user input
-        var validator = new CreateRequestDtoValidator(_employeeRepository);
-        var validationResult = await validator.ValidateAsync(
-            request.CreateRequestDto,
-            cancellationToken
-        );
-        if (!validationResult.IsValid)
+        try
         {
-            var errors = validationResult
-                .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
-                .ToList();
-            return BaseResult<Guid>.Failure(errors);
-        }
-        //1. check requestedTo user
-        var requestedTo = await _employeeRepository.GetEmployeeByEmailAsync(
-            request.CreateRequestDto.RequestedToEmail,
-            cancellationToken
-        );
-        if (requestedTo is null)
-            return BaseResult<Guid>.Failure(
-                EmployeeErrors.NotFound(request.CreateRequestDto.RequestedToEmail)
+            //validate user input
+            var validator = new CreateRequestDtoValidator(_employeeRepository);
+            var validationResult = await validator.ValidateAsync(
+                request.CreateRequestDto,
+                cancellationToken
             );
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult
+                    .Errors.Select(e => new Error(400, e.PropertyName, e.ErrorMessage.ToString()))
+                    .ToList();
+                return BaseResult<Guid>.Failure(errors);
+            }
+            //1. check requestedTo user
+            var requestedTo = await _employeeRepository.GetEmployeeByEmailAsync(
+                request.CreateRequestDto.RequestedToEmail,
+                cancellationToken
+            );
+            if (requestedTo is null)
+                return BaseResult<Guid>.Failure(
+                    EmployeeErrors.NotFound(request.CreateRequestDto.RequestedToEmail)
+                );
 
-        request.CreateRequestDto.RequestedTo = requestedTo.Id;
+            request.CreateRequestDto.RequestedTo = requestedTo.Id;
 
-        //2.get current user
-        var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
-            _currentUserService.UserEmail!,
-            cancellationToken
-        );
-        if (currentUser is null)
+            //2.get current user
+            var currentUser = await _employeeRepository.GetEmployeeByEmailAsync(
+                _currentUserService.UserEmail!,
+                cancellationToken
+            );
+            if (currentUser is null)
+            {
+                return BaseResult<Guid>.Failure(EmployeeErrors.Unauthorize());
+            }
+
+            if (currentUser.Id == requestedTo.Id)
+                return BaseResult<Guid>.Failure(
+                    new Error(400, "Request.Submit", "Can't submit to own email")
+                );
+            var existingEmployee = currentUser;
+
+            //3.check previous pending request
+            var previousRequestExist = currentUser.Requests.Any(x =>
+                x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
+            );
+            if (previousRequestExist)
+                return BaseResult<Guid>.Failure(
+                    new Error(
+                        400,
+                        "Request.Submit",
+                        "Your previous request is pending so can't summit new request."
+                    )
+                );
+
+            var toRequest = _mapper.Map<GeneralRequest>(request.CreateRequestDto);
+
+            //4.submit request
+            currentUser.SubmitRequest(toRequest);
+            await _employeeRepository.UpdateEmployeeAsync(
+                currentUser,
+                existingEmployee,
+                cancellationToken
+            );
+            // await _employeeRepository.SaveChangesAsync(cancellationToken);
+            return BaseResult<Guid>.Ok(toRequest.GuidId);
+        }
+        catch (Exception e)
         {
-            return BaseResult<Guid>.Failure(EmployeeErrors.Unauthorize());
+            throw;
         }
-
-        if (currentUser.Id == requestedTo.Id)
-            return BaseResult<Guid>.Failure(
-                new Error(400, "Request.Submit", "Can't submit to own email")
-            );
-        var existingEmployee = currentUser;
-
-        //3.check previous pending request
-        var previousRequestExist = currentUser.Requests.Any(x =>
-            x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
-        );
-        if (previousRequestExist)
-            return BaseResult<Guid>.Failure(
-                new Error(
-                    400,
-                    "Request.Submit",
-                    "Your previous request is pending so can't summit new request."
-                )
-            );
-
-        var toRequest = _mapper.Map<GeneralRequest>(request.CreateRequestDto);
-        // var toRequest = GeneralRequest.Create(
-        //     currentUser.Id,
-        //     request.CreateRequestDto.RequestedTo,
-        //     request.CreateRequestDto.FromDate,
-        //     request.CreateRequestDto.ToDate,
-        //     request.CreateRequestDto.Description
-        // );
-
-        //4.submit request
-        currentUser.SubmitRequest(toRequest);
-        await _employeeRepository.UpdateEmployeeAsync(
-            currentUser,
-            existingEmployee,
-            cancellationToken
-        );
-        // await _employeeRepository.SaveChangesAsync(cancellationToken);
-        return BaseResult<Guid>.Ok(toRequest.GuidId);
     }
 }
