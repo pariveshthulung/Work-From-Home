@@ -91,7 +91,12 @@ public class UpdateEmployeeCommandHandlerTest
         result.Success.Should().BeFalse();
         result.Errors.Should().Contain(EmployeeErrors.NotFound());
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -141,7 +146,12 @@ public class UpdateEmployeeCommandHandlerTest
         employee.UpdatedBy.Should().Be(employee.Id);
         employee.Name.Should().Be(updateEmployeeDto.Name);
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
     }

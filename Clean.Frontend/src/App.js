@@ -20,13 +20,14 @@ import oktaConfig from "./config";
 import { OktaAuth } from "@okta/okta-auth-js";
 import ChangePassword from "./components/Auth/ChangePassword";
 import ApproveRequest from "./components/Request/ApproveRequest";
+import AuthCallback from "./components/Auth/AuthCallback";
 
 function App() {
   const [employee, setEmployee] = useState([]);
   const oktaAuth = new OktaAuth(oktaConfig);
 
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
-    window.location.assign(originalUri || "/", { replace: true });
+    window.location.replace(originalUri || "/", { replace: true });
   };
 
   return (
@@ -34,6 +35,7 @@ function App() {
       <Router>
         <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
           <Routes>
+            <Route path="/callback" element={<LoginCallback />} />
             <Route
               path="/"
               element={

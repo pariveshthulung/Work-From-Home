@@ -21,39 +21,48 @@ public class ChangePasswordCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        var validator = new ChangePasswordCommandValidator();
-        var validationResult = await validator.ValidateAsync(
-            request.ChangePasswordDto,
-            cancellationToken
-        );
-        if (!validationResult.IsValid)
+        try
         {
-            var errors = validationResult.Errors.Select(e => new Error(
-                400,
-                e.PropertyName,
-                e.ErrorMessage
-            ));
-            return BaseResult<Unit>.Failure(errors);
+            var validator = new ChangePasswordCommandValidator();
+            var validationResult = await validator.ValidateAsync(
+                request.ChangePasswordDto,
+                cancellationToken
+            );
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => new Error(
+                    400,
+                    e.PropertyName,
+                    e.ErrorMessage
+                ));
+                return BaseResult<Unit>.Failure(errors);
+            }
+
+            var user =
+                await userManager.Users.FirstOrDefaultAsync(x =>
+                    x.Email == currentUserService.UserEmail
+                ) ?? throw new Exception("Unauthorize user");
+
+            var result = await userManager.ChangePasswordAsync(
+                user,
+                request.ChangePasswordDto.CurrentPassword,
+                request.ChangePasswordDto.NewPassword
+            );
+
+            if (!result.Succeeded)
+            {
+                var errors = result
+                    .Errors.Select(e => new Error(400, e.Code, e.Description))
+                    .ToList();
+                return BaseResult<Unit>.Failure(errors);
+            }
+
+            await signInManager.SignOutAsync();
+            return BaseResult<Unit>.Ok(Unit.Value);
         }
-
-        var user =
-            await userManager.Users.FirstOrDefaultAsync(x =>
-                x.Email == currentUserService.UserEmail
-            ) ?? throw new Exception("Unauthorize user");
-
-        var result = await userManager.ChangePasswordAsync(
-            user,
-            request.ChangePasswordDto.CurrentPassword,
-            request.ChangePasswordDto.NewPassword
-        );
-
-        if (!result.Succeeded)
+        catch (Exception e)
         {
-            var errors = result.Errors.Select(e => new Error(400, e.Code, e.Description)).ToList();
-            return BaseResult<Unit>.Failure(errors);
+            throw;
         }
-
-        await signInManager.SignOutAsync();
-        return BaseResult<Unit>.Ok(Unit.Value);
     }
 }

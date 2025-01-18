@@ -1,10 +1,12 @@
 using System.Net;
 using Clean.Api.Controller.Common;
 using Clean.Api.Extension;
+using Clean.Application.Dto.Auth;
 using Clean.Application.Dto.Token;
 using Clean.Application.Feature.Auth.Commands.ChangePassword;
 using Clean.Application.Feature.Auth.Commands.Login;
 using Clean.Application.Feature.Auth.Commands.Register;
+using Clean.Application.Feature.Auth.Commands.UpdatePassword;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +66,26 @@ namespace Clean.Api.Controller
         )
         {
             var response = await mediator.Send(command, cancellationToken);
+            if (!response.Success)
+                return response.ToProblemDetail();
+
+            return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpPut("updatePassword")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> UpdatePassword(
+            [FromBody] UpdatePasswordDto updatePasswordDto,
+            CancellationToken cancellationToken
+        )
+        {
+            var response = await mediator.Send(
+                new UpdatePasswordCommand { UpdatePasswordDto = updatePasswordDto },
+                cancellationToken
+            );
             if (!response.Success)
                 return response.ToProblemDetail();
 

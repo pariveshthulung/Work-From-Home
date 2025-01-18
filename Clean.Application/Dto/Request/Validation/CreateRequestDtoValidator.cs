@@ -32,16 +32,11 @@ public class CreateRequestDtoValidator : AbstractValidator<CreateRequestDto>
             .NotEmpty()
             .WithMessage("{PropertyName} is required.")
             .LessThan(e => e.ToDate)
-            .WithMessage("{PropertyName} should be less than {ComparisionValue}");
+            .WithMessage("{PropertyName} should be less than ToDate");
         RuleFor(e => e.ToDate)
             .NotEmpty()
             .WithMessage("{PropertyName} is required.")
             .GreaterThan(e => e.FromDate)
-            .WithMessage("{PropertyName} should be greater than {ComparisionValue}");
-        RuleFor(e => e.RequestedTypeId)
-            .NotEmpty()
-            .WithMessage("{PropertyName} is required.")
-            .Must(id => RequestTypeEnum.RequestTypes.Any(type => type.Id == id))
-            .WithMessage("{PropertyName} is invalid.");
+            .WithMessage("{PropertyName} should be greater than FromDate");
     }
 }

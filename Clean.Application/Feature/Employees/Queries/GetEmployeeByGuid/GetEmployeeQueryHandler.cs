@@ -25,12 +25,19 @@ public class GetEmployeeQueryHandler : IRequestHandler<GetEmployeeQuery, BaseRes
         CancellationToken cancellationToken
     )
     {
-        var employee = await _employeeRepo.GetEmployeeByGuidIdAsync(
-            request.GuidId,
-            cancellationToken
-        );
-        if (employee is null)
-            return BaseResult<EmployeeDto>.Failure(EmployeeErrors.NotFound());
-        return BaseResult<EmployeeDto>.Ok(_mapper.Map<EmployeeDto>(employee));
+        try
+        {
+            var employee = await _employeeRepo.GetEmployeeByGuidIdAsync(
+                request.GuidId,
+                cancellationToken
+            );
+            if (employee is null)
+                return BaseResult<EmployeeDto>.Failure(EmployeeErrors.NotFound());
+            return BaseResult<EmployeeDto>.Ok(_mapper.Map<EmployeeDto>(employee));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

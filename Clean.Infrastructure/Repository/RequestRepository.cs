@@ -1,3 +1,6 @@
+using System.Linq.Expressions;
+using AutoMapper;
+using Clean.Application.Dto.Request;
 using Clean.Application.Helper;
 using Clean.Application.Persistence.Contract;
 using Clean.Domain.Entities;
@@ -7,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Clean.Infrastructure.Repository;
 
-public class RequestRepository(ApplicationDbContext context) : IRequestRepository
+public class RequestRepository(ApplicationDbContext context, IMapper mapper) : IRequestRepository
 {
     public async Task DeleteRequestAsync(Request request, CancellationToken cancellationToken)
     {
@@ -22,24 +25,55 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         }
     }
 
-    public async Task<List<Request>> GetAllRequestAsync(
-        QueryObject query,
+    public async Task<PagedList<RequestDto>> GetAllRequestAsync(
+        string? searchTerm,
+        string? sortColumn,
+        string? sortOrder,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken
     )
     {
         try
         {
-            var requests = context.Requests.Include(x => x.Employee).AsQueryable();
-
-            return await requests
+            IQueryable<Request> requests = context
+                .Requests.Include(x => x.Employee)
+                .Include(x => x.RequestedByEmployee)
                 .Include(x => x.Approval)
-                .Include(x => x.RequestedToEmployee)
-                // .Include(x => x.AddedByEmployee)
-                // .Include(x => x.UpdatedByEmployee)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .Include(x => x.RequestedType)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                requests = requests.Where(x =>
+                    x.Employee!.Email.Contains(searchTerm) || x.Employee.Name.Contains(searchTerm)
+                );
+            }
+
+            Expression<Func<Request, object>> keyselector = sortColumn?.ToLower() switch
+            {
+                "name" => request => request.Employee!.Name,
+                "email" => request => request.Employee!.Email,
+                _ => request => request.Id,
+            };
+
+            if (sortOrder?.ToLower() == "desc")
+            {
+                requests = requests.OrderByDescending(keyselector);
+            }
+            else
+            {
+                requests = requests.OrderBy(keyselector);
+            }
+            var requestsDto = requests.Select(x => mapper.Map<RequestDto>(x));
+            var requestPagedList = await PagedList<RequestDto>.CreateAsync(
+                requestsDto,
+                pageNumber,
+                pageSize
+            );
+            return requestPagedList;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -62,7 +96,7 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -100,7 +134,7 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -117,7 +151,7 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
             await context.SaveChangesAsync(cancellationToken);
             return request;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -130,7 +164,7 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
             context.Requests.Update(request);
             await context.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -153,7 +187,7 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
                 .AsNoTracking()
                 .ToListAsync(cancellationToken: cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             throw;
         }
@@ -164,11 +198,18 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         CancellationToken cancellationToken
     )
     {
-        return await context
-            .Requests.Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .FirstOrDefaultAsync(e => e.GuidId == guidId, cancellationToken);
+        try
+        {
+            return await context
+                .Requests.Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .FirstOrDefaultAsync(e => e.GuidId == guidId, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestByUserGuidIdAsync(
@@ -176,12 +217,19 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         CancellationToken cancellationToken
     )
     {
-        return await context
-            .Requests.Where(x => x.Employee!.GuidId == userGuidId)
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            return await context
+                .Requests.Where(x => x.Employee!.GuidId == userGuidId)
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestByUserEmailAsync(
@@ -189,16 +237,23 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         CancellationToken cancellationToken
     )
     {
-        var employeeId = await context
-            .Employees.Where(x => x.Email == email)
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-        return await context
-            .Requests.Where(r => r.EmployeeId == employeeId)
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            var employeeId = await context
+                .Employees.Where(x => x.Email == email)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            return await context
+                .Requests.Where(r => r.EmployeeId == employeeId)
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     public async Task<List<Request>> GetAllRequestSubmittedToUserAsync(
@@ -206,18 +261,25 @@ public class RequestRepository(ApplicationDbContext context) : IRequestRepositor
         CancellationToken cancellationToken
     )
     {
-        var emailId = await context
-            .Employees.Where(x => x.Email.Equals(email))
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        return await context
-            .Requests.Where(x =>
-                x.RequestedTo == emailId
-                && x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
-            )
-            .Include(x => x.Approval)
-            .Include(x => x.Employee)
-            .Include(x => x.RequestedToEmployee)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            var emailId = await context
+                .Employees.Where(x => x.Email.Equals(email))
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            return await context
+                .Requests.Where(x =>
+                    x.RequestedTo == emailId
+                    && x.Approval!.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
+                )
+                .Include(x => x.Approval)
+                .Include(x => x.Employee)
+                .Include(x => x.RequestedToEmployee)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

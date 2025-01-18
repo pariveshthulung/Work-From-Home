@@ -13,7 +13,7 @@ namespace Clean.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20241105072210_navigation")]
-    partial class navigation
+    partial class Navigation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -80,46 +80,10 @@ namespace Clean.Api.Dependency
             IConfiguration configuration
         )
         {
-            #region Swagger
-            // services.AddSwaggerGen(option =>
-            // {
-            //     option.SwaggerDoc("v1", new OpenApiInfo { Title = "WorkFromHome.Api", Version = "v1" });
-            //     option.AddSecurityDefinition(
-            //         "Bearer",
-            //         new OpenApiSecurityScheme
-            //         {
-            //             In = ParameterLocation.Header,
-            //             Description = "Please enter a valid token",
-            //             Name = "Authorization",
-            //             Type = SecuritySchemeType.Http,
-            //             BearerFormat = "JWT",
-            //             Scheme = "Bearer"
-            //         }
-            //     );
-            //     option.AddSecurityRequirement(
-            //         new OpenApiSecurityRequirement
-            //         {
-            //             {
-            //                 new OpenApiSecurityScheme
-            //                 {
-            //                     Reference = new OpenApiReference
-            //                     {
-            //                         Type = ReferenceType.SecurityScheme,
-            //                         Id = "Bearer"
-            //                     }
-            //                 },
-            //                 Array.Empty<string>()
-            //             }
-            //         }
-            //     );
-            // });
-            #endregion
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WorkFromHome", Version = "v1" });
 
-                // OAuth2 Configuration for Okta
                 c.AddSecurityDefinition(
                     "oauth2",
                     new OpenApiSecurityScheme
@@ -131,11 +95,11 @@ namespace Clean.Api.Dependency
                             {
                                 AuthorizationUrl = new Uri(
                                     // $"{configuration["Okta:OktaDomain"]}/oauth2/default/v1/authorize"
-                                    "https://dev-93378940.okta.com/oauth2/ausjszru5jA7nhqRh5d7/v1/authorize"
+                                    $"{OktaSettings?.OktaDomain}/oauth2/ausjszru5jA7nhqRh5d7/v1/authorize"
                                 ),
                                 TokenUrl = new Uri(
                                     // $"{configuration["Okta:OktaDomain"]}/oauth2/default/v1/token"
-                                    "https://dev-93378940.okta.com/oauth2/ausjszru5jA7nhqRh5d7/v1/token"
+                                    $"{OktaSettings?.OktaDomain}/oauth2/ausjszru5jA7nhqRh5d7/v1/token"
                                 ),
                                 Scopes = new Dictionary<string, string>
                                 {
@@ -233,19 +197,6 @@ namespace Clean.Api.Dependency
                         };
                     }
                 );
-            // .AddOpenIdConnect(options =>
-            // {
-            //     options.ClientId = configuration["Okta:ClientId"];
-            //     options.ClientSecret = configuration["Okta:ClientSecret"];
-            //     options.Authority = $"{configuration["Okta:OktaDomain"]}/oauth2/default";
-            //     options.CallbackPath = "/authorization-code/callback";
-            //     options.ResponseType = "code";
-            //     options.SaveTokens = true;
-            //     options.GetClaimsFromUserInfoEndpoint = true;
-            //     options.Scope.Add("openid");
-            //     options.Scope.Add("email");
-            //     options.Scope.Add("profile");
-            // });
             ;
         }
 

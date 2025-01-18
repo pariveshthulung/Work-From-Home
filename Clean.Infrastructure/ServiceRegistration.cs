@@ -3,7 +3,6 @@ using Clean.Application.Persistence.Services;
 using Clean.Infrastructure.Backgrounds;
 using Clean.Infrastructure.Repository;
 using Clean.Infrastructure.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 
@@ -13,7 +12,7 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services)
     {
-        services.AddQuartz();
+        // services.AddQuartz();
 
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();

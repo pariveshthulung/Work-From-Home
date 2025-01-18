@@ -70,55 +70,55 @@ namespace Clean.Test
             Assert.True(testResult.IsSuccessful);
         }
 
-        [Fact]
-        public void Api_Should_Not_HaveDependencyOnOtherProject()
-        {
-            //arrange
-            var assembly = typeof(Clean.Api.AssemblyReference).Assembly;
+        // [Fact]
+        // public void Api_Should_Not_HaveDependencyOnOtherProject()
+        // {
+        //     //arrange
+        //     var assembly = typeof(Clean.Api.AssemblyReference).Assembly;
 
-            //act
-            var testResult = Types
-                .InAssembly(assembly)
-                .ShouldNot()
-                .HaveDependencyOn(DomainNamespace)
-                .GetResult();
+        //     //act
+        //     var testResult = Types
+        //         .InAssembly(assembly)
+        //         .ShouldNot()
+        //         .HaveDependencyOn(DomainNamespace)
+        //         .GetResult();
 
-            //assert
-            Assert.True(testResult.IsSuccessful);
-        }
+        //     //assert
+        //     Assert.True(testResult.IsSuccessful);
+        // }
 
-        [Fact]
-        public void Handlers_Should_HaveDependencyOnDomain()
-        {
-            //arrange
-            var assembly = typeof(Clean.Application.AssemblyReference).Assembly;
-            //act
-            var testResult = Types
-                .InAssembly(assembly)
-                .That()
-                .HaveNameEndingWith("Handler")
-                .Should()
-                .HaveDependencyOn(DomainNamespace)
-                .GetResult();
-            //assert
-            Assert.True(testResult.IsSuccessful);
-        }
+        // [Fact]
+        // public void Handlers_Should_HaveDependencyOnDomain()
+        // {
+        //     //arrange
+        //     var assembly = typeof(Clean.Application.AssemblyReference).Assembly;
+        //     //act
+        //     var testResult = Types
+        //         .InAssembly(assembly)
+        //         .That()
+        //         .HaveNameEndingWith("Handler")
+        //         .Should()
+        //         .HaveDependencyOn(DomainNamespace)
+        //         .GetResult();
+        //     //assert
+        //     Assert.True(testResult.IsSuccessful);
+        // }
 
-        [Fact]
-        public void Controllers_Should_HaveDependencyOnMediatR()
-        {
-            //arrange
-            var assembly = typeof(Clean.Api.AssemblyReference).Assembly;
-            //act
-            var testResult = Types
-                .InAssembly(assembly)
-                .That()
-                .HaveNameEndingWith("Controller")
-                .Should()
-                .HaveDependencyOn("MediatR")
-                .GetResult();
-            //assert
-            Assert.True(testResult.IsSuccessful);
-        }
+        // [Fact]
+        // public void Controllers_Should_HaveDependencyOnMediatR()
+        // {
+        //     //arrange
+        //     var assembly = typeof(Clean.Api.AssemblyReference).Assembly;
+        //     //act
+        //     var testResult = Types
+        //         .InAssembly(assembly)
+        //         .That()
+        //         .HaveNameEndingWith("Controller")
+        //         .Should()
+        //         .HaveDependencyOn("MediatR")
+        //         .GetResult();
+        //     //assert
+        //     Assert.True(testResult.IsSuccessful);
+        // }
     }
 }

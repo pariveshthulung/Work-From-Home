@@ -23,9 +23,16 @@ public class RequestTypeEnumQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var requestTypeEnum = await _enumRepository.GetRequestedTypeAsync(cancellationToken);
-        return BaseResult<List<RequestTypeEnumDto>>.Ok(
-            _mapper.Map<List<RequestTypeEnumDto>>(requestTypeEnum)
-        );
+        try
+        {
+            var requestTypeEnum = await _enumRepository.GetRequestedTypeAsync(cancellationToken);
+            return BaseResult<List<RequestTypeEnumDto>>.Ok(
+                _mapper.Map<List<RequestTypeEnumDto>>(requestTypeEnum)
+            );
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

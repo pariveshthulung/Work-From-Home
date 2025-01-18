@@ -1,6 +1,5 @@
 using AutoMapper;
 using Clean.Application.Dto.Request;
-using Clean.Application.Dto.Request.Validation;
 using Clean.Application.Feature.Requests.Handlers.Commands;
 using Clean.Application.Feature.Requests.Requests.Commands;
 using Clean.Application.Persistence.Contract;
@@ -42,7 +41,6 @@ public class SubmitRequestCommandHandlerTest
             RequestedTo = 2,
             FromDate = DateTime.UtcNow.AddDays(5),
             ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 1,
         };
 
         var command = new SubmitRequestCommand { CreateRequestDto = requestDto };
@@ -56,7 +54,12 @@ public class SubmitRequestCommandHandlerTest
             Times.Never
         );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -70,7 +73,6 @@ public class SubmitRequestCommandHandlerTest
             RequestedTo = 2,
             FromDate = DateTime.UtcNow,
             ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 1,
         };
 
         var command = new SubmitRequestCommand { CreateRequestDto = requestDto };
@@ -89,7 +91,12 @@ public class SubmitRequestCommandHandlerTest
         result.Errors.Should().Contain(EmployeeErrors.NotFound(""));
 
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -104,7 +111,6 @@ public class SubmitRequestCommandHandlerTest
             RequestedTo = 2,
             FromDate = DateTime.UtcNow,
             ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 1,
         };
         var requestedToEmployee = GeneralEmployee.Create(
             "Parivesh",
@@ -128,7 +134,12 @@ public class SubmitRequestCommandHandlerTest
         result.Success.Should().BeFalse();
         result.Errors.Should().Contain(EmployeeErrors.Unauthorize());
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -143,7 +154,6 @@ public class SubmitRequestCommandHandlerTest
             RequestedTo = 2,
             FromDate = DateTime.UtcNow,
             ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 1,
         };
         var currentUser = GeneralEmployee.Create(
             "Parivesh",
@@ -178,7 +188,12 @@ public class SubmitRequestCommandHandlerTest
             .Errors.Should()
             .Contain(new Error(400, "Request.Submit", "Can't submit to own email"));
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -192,7 +207,6 @@ public class SubmitRequestCommandHandlerTest
             RequestedToEmail = "hari@gmail.com",
             FromDate = DateTime.UtcNow,
             ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 1,
         };
         var currentUser = GeneralEmployee.Create(
             "Parivesh",
@@ -212,9 +226,9 @@ public class SubmitRequestCommandHandlerTest
         var request = GeneralRequest.Create(
             requestBy: 1,
             requestTo: 2,
-            requestedTypeId: 1,
             fromDate: DateTime.UtcNow.AddDays(1),
-            toDate: DateTime.UtcNow.AddDays(2)
+            toDate: DateTime.UtcNow.AddDays(2),
+            description: "sick"
         );
         currentUser.SubmitRequest(request);
 
@@ -228,7 +242,7 @@ public class SubmitRequestCommandHandlerTest
         _employeeRepositoryMock
             .Setup(x =>
                 x.GetEmployeeByEmailAsync(
-                    _currentUserMock.Object.UserEmail,
+                    _currentUserMock.Object.UserEmail!,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -251,7 +265,12 @@ public class SubmitRequestCommandHandlerTest
                 )
             );
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -264,8 +283,7 @@ public class SubmitRequestCommandHandlerTest
         {
             RequestedToEmail = "hari@gmail.com",
             FromDate = DateTime.UtcNow,
-            ToDate = DateTime.UtcNow.AddDays(2),
-            RequestedTypeId = 3,
+            ToDate = DateTime.UtcNow.AddDays(2)
         };
         var currentUser = GeneralEmployee.Create(
             "Parivesh",
@@ -285,11 +303,11 @@ public class SubmitRequestCommandHandlerTest
         var request = GeneralRequest.Create(
             requestBy: 1,
             requestTo: 2,
-            requestedTypeId: 1,
             fromDate: DateTime.UtcNow.AddDays(1),
-            toDate: DateTime.UtcNow.AddDays(2)
+            toDate: DateTime.UtcNow.AddDays(2),
+            description: "sick"
         );
-        currentUser.SubmitRequest(request);
+        // currentUser.SubmitRequest(request);
 
         var command = new SubmitRequestCommand { CreateRequestDto = requestDto };
 
@@ -301,7 +319,7 @@ public class SubmitRequestCommandHandlerTest
         _employeeRepositoryMock
             .Setup(x =>
                 x.GetEmployeeByEmailAsync(
-                    _currentUserMock.Object.UserEmail,
+                    _currentUserMock.Object.UserEmail!,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -316,7 +334,12 @@ public class SubmitRequestCommandHandlerTest
         result.Errors.Should().BeNull();
 
         _employeeRepositoryMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
     }

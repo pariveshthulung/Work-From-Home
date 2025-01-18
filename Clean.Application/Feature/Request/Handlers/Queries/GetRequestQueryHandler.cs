@@ -23,16 +23,23 @@ public class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, BaseResul
         CancellationToken cancellationToken
     )
     {
-        var employees = await _employeeRepo.GetEmployeeByGuidIdAsync(
-            query.EmployeeId,
-            cancellationToken
-        );
-        if (employees is null)
-            return BaseResult<RequestDto>.Failure(EmployeeErrors.NotFound());
+        try
+        {
+            var employees = await _employeeRepo.GetEmployeeByGuidIdAsync(
+                query.EmployeeId,
+                cancellationToken
+            );
+            if (employees is null)
+                return BaseResult<RequestDto>.Failure(EmployeeErrors.NotFound());
 
-        var request = employees.Requests.FirstOrDefault(x => x.GuidId == query.RequestId);
-        if (request is null)
-            return BaseResult<RequestDto>.Failure(RequestErrors.NotFound());
-        return BaseResult<RequestDto>.Ok(_mapper.Map<RequestDto>(request));
+            var request = employees.Requests.FirstOrDefault(x => x.GuidId == query.RequestId);
+            if (request is null)
+                return BaseResult<RequestDto>.Failure(RequestErrors.NotFound());
+            return BaseResult<RequestDto>.Ok(_mapper.Map<RequestDto>(request));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

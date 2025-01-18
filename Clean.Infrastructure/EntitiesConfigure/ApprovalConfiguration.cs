@@ -1,4 +1,3 @@
-using System;
 using Clean.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

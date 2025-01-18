@@ -1,3 +1,4 @@
+using Clean.Application.Dto.Request;
 using Clean.Application.Helper;
 using Clean.Domain.Entities;
 
@@ -7,7 +8,14 @@ public interface IRequestRepository
 {
     Task<Request?> GetRequestByIdAsync(int id, CancellationToken cancellationToken);
     Task<Request?> GetRequestByGuidIdAsync(Guid guidId, CancellationToken cancellationToken);
-    Task<List<Request>> GetAllRequestAsync(QueryObject query, CancellationToken cancellationToken);
+    Task<PagedList<RequestDto>> GetAllRequestAsync(
+        string? searchTerm,
+        string? sortColumn,
+        string? sortOrder,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken
+    );
     Task<List<Request>> GetAllRequestByStatusAsync(
         string approvalStatus,
         CancellationToken cancellationToken

@@ -8,26 +8,34 @@ import UserProfileComponent from "./UserProfileComponent";
 const NavbarComponent = () => {
   const authContext = useContext(AuthContext);
   const { auth } = useAuth(AuthContext);
+  const [active, setActive] = useState("Request");
 
-  const [active, setActive] = useState(() => {
-    if (
-      auth?.userRole === "Manager" ||
-      auth?.userRole === "Admin" ||
-      auth?.userRole === "SuperAdmin" ||
-      auth?.userRole === "Ceo"
-    ) {
-      return "Employee";
-    } else {
-      return "Request";
-    }
-  });
+  // const [active, setActive] = useState(() => {
+  //   if (
+  //     auth?.userRole === "Manager" ||
+  //     auth?.userRole === "Admin" ||
+  //     auth?.userRole === "SuperAdmin" ||
+  //     auth?.userRole === "Ceo"
+  //   ) {
+  //     return "Employee";
+  //   } else {
+  //     return "Request";
+  //   }
+  // });
   const navigate = useNavigate();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light mb-5">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
-          WorkFromHome
+        <a
+          style={{ cursor: "pointer" }}
+          className="navbar-brand"
+          onClick={() => {
+            setActive("Request");
+            navigate("/userRequest");
+          }}
+        >
+          <strong>WorkFromHome</strong>
         </a>
         <button
           className="navbar-toggler"
@@ -48,6 +56,25 @@ const NavbarComponent = () => {
               authContext.auth.userRole === "Manager" ||
               authContext.auth.userRole === "SuperAdmin") ? (
               <>
+                <RequestDropdown setActive={setActive} active={active} />
+                {authContext.auth.userRole !== "SuperAdmin" && (
+                  <li className="nav-item" style={{ cursor: "pointer" }}>
+                    <a
+                      className={
+                        active === "SubmitRequest"
+                          ? "nav-link active"
+                          : "nav-link"
+                      }
+                      onClick={() => {
+                        setActive("SubmitRequest");
+                        navigate("/submitRequest");
+                      }}
+                    >
+                      <strong>Create Request</strong>
+                    </a>
+                  </li>
+                )}
+
                 <li className="nav-item" style={{ cursor: "pointer" }}>
                   <a
                     className={
@@ -58,23 +85,7 @@ const NavbarComponent = () => {
                       navigate("/");
                     }}
                   >
-                    Employee
-                  </a>
-                </li>
-                <RequestDropdown setActive={setActive} active={active} />
-                <li className="nav-item" style={{ cursor: "pointer" }}>
-                  <a
-                    className={
-                      active === "SubmitRequest"
-                        ? "nav-link active"
-                        : "nav-link"
-                    }
-                    onClick={() => {
-                      setActive("SubmitRequest");
-                      navigate("/submitRequest");
-                    }}
-                  >
-                    Submit Request
+                    <strong>Employee</strong>
                   </a>
                 </li>
               </>
@@ -91,7 +102,7 @@ const NavbarComponent = () => {
                     navigate("/userRequest");
                   }}
                 >
-                  Request
+                  <strong>Requests</strong>
                 </a>
                 <a
                   style={{ cursor: "pointer" }}
@@ -103,7 +114,7 @@ const NavbarComponent = () => {
                     navigate("/submitRequest");
                   }}
                 >
-                  Submit Request
+                  <strong>Create Request</strong>
                 </a>
               </>
             )}

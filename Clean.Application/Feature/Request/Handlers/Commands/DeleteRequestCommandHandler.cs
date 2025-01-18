@@ -28,12 +28,13 @@ public class DeleteRequestCommandHandler : IRequestHandler<DeleteRequestCommand,
             );
             if (employee is null)
                 return BaseResult<Unit>.Failure(EmployeeErrors.NotFound());
+            var existingEmployee = employee;
             var request = employee.Requests.FirstOrDefault(x => x.GuidId == command.RequestId);
             if (request is null)
                 return BaseResult<Unit>.Failure(RequestErrors.NotFound());
             employee.DeleteRequest(request);
 
-            await _employeeRepo.UpdateEmployeeAsync(employee, cancellationToken);
+            await _employeeRepo.UpdateEmployeeAsync(employee, existingEmployee, cancellationToken);
             return BaseResult<Unit>.Ok(Unit.Value);
         }
         catch (Exception e)

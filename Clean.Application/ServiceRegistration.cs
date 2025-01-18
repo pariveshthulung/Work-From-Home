@@ -1,5 +1,4 @@
 using System.Reflection;
-using Clean.Application.Behaviours;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +13,9 @@ public static class ServiceRegistration
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(cfg =>
             // cfg.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly)
-            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()) //ttry
+            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()) //try
         );
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoginPipelineBehaviour<,>));
+        // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoginPipelineBehaviour<,>));
         return services;
     }
 }

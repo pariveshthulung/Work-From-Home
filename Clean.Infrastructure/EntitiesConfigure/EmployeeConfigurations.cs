@@ -13,19 +13,12 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(10);
         builder.Property(e => e.Email).IsRequired().HasMaxLength(50);
         builder.HasIndex(e => e.Email).IsUnique();
-        builder.OwnsOne(
-            e => e.Address,
-            a =>
-            {
-                a.Property(e => e.Street).HasMaxLength(20);
-                a.Property(e => e.City).IsRequired().HasMaxLength(20);
-                a.Property(e => e.PostalCode).HasMaxLength(10);
-            }
-        );
+        builder.OwnsOne(e => e.Address);
         builder
             .HasDiscriminator<string>("Discriminator")
             .HasValue<GeneralEmployee>("GeneralEmployee");
         builder.HasOne(a => a.AppUser).WithOne().HasForeignKey<Employee>(a => a.AppUserId);
+        builder.HasOne(a => a.Manager).WithOne().HasForeignKey<Employee>(a => a.ManagerId);
         builder.HasQueryFilter(e => !e.IsDeleted);
         builder.HasMany(e => e.Requests).WithOne(r => r.Employee).HasForeignKey(r => r.EmployeeId);
     }

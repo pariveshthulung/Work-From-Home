@@ -99,110 +99,142 @@ export default function AddEmployee() {
     }
   };
   return (
-    <div className="container">
-      <ToastContainer />
-      <div className="row justify-content-center">
-        <div className="col-12 text-center">
-          <h1>Update Employee</h1>
-        </div>
-        <div className="col-md-6 mt-3">
-          <form>
-            <div className="form-row">
-              <div className="row d-flex justify-content-center">
-                <div className="form-group col-md-4">
-                  <label htmlFor="inputEmail4">Name</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="form-control"
-                    required
-                  />
-                </div>
-                <div className="form-group col-md-4">
-                  <label htmlFor="inputEmail4">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="form-control"
-                    required
-                    disabled
-                  />
-                </div>
-              </div>
-              <div className="row d-flex justify-content-center">
-                <div className="form-group col-md-4">
-                  <label htmlFor="dropdown">Select a Role:</label>
-                  <select
-                    id="dropdown"
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                  >
-                    <option value="">Select an option</option>
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group col-md-4">
-                  <label htmlFor="inputEmail4">Phone number</label>
-                  <input
-                    type="text"
-                    value={phoneNo}
-                    required
-                    onChange={(e) => setPhoneNo(e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="row d-flex justify-content-center">
-              <div className="col-md-3">
-                <label htmlFor="inputAddress">Street</label>
-                <input
-                  type="text"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="col-md-3">
-                <label htmlFor="inputCity">City</label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="col-md-2">
-                <label htmlFor="inputZip">PostalCode</label>
-                <input
-                  type="text"
-                  value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
-                  className="form-control"
-                  required
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              style={{ margin: "auto" }}
-              onClick={handleUpdateEmployee}
-              className="btn btn-primary my-3 d-flex justify-content-center ml-5"
+    <section className="vh-100 gradient-custom">
+      <div className="container py-5">
+        {/* <ToastContainer /> */}
+        <div className="row  d-flex justify-content-center h-100">
+          <div className="col-10">
+            <div
+              className="card bg-light text-dark"
+              style={{ borderRadius: "1rem" }}
             >
-              Update Employee
-            </button>
-          </form>
+              <div className="mt-4 mx-5 text-center">
+                <h1>Edit Employee</h1>
+              </div>
+              {/* ------------------------------------------------------------------------- */}
+              {/* <div className="row mb-5 d-flex justify-content-center ">
+                <div
+                  className="card bg-light col-2 h-50 text-dark mt-5"
+                  style={{ borderRadius: "1rem" }}
+                > */}
+              <div className="container">
+                <ToastContainer />
+                <div className="row justify-content-center">
+                  <div className="col-md-6 mt-3">
+                    <form>
+                      <div className="form-row">
+                        <div className="row d-flex justify-content-center">
+                          <div className="form-group col-md-5 mb-4">
+                            <label htmlFor="inputEmail4">Name</label>
+                            <input
+                              type="text"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              className="form-control"
+                              required
+                            />
+                          </div>
+                          <div className="form-group col-md-5 mb-4">
+                            <label htmlFor="inputEmail4">Email</label>
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="form-control"
+                              required
+                              disabled
+                            />
+                          </div>
+                        </div>
+                        <div className="row d-flex justify-content-center">
+                          <div className="form-group col-md-5 mb-4">
+                            <label htmlFor="dropdown">Select a Role:</label>
+                            <select
+                              className="form-control"
+                              id="dropdown"
+                              value={selectedRole}
+                              onChange={(e) => setSelectedRole(e.target.value)}
+                            >
+                              <option value="">Select an option</option>
+                              {roles.map((role) => (
+                                <option key={role.id} value={role.id}>
+                                  {role.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="form-group col-md-5 mb-4">
+                            <label htmlFor="inputEmail4">Phone number</label>
+                            <input
+                              type="text"
+                              value={phoneNo}
+                              required
+                              onChange={(e) => setPhoneNo(e.target.value)}
+                              className="form-control"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="row d-flex justify-content-center mb-3">
+                        <div className="col-md-4 mb-4">
+                          <label htmlFor="inputAddress">Street</label>
+                          <input
+                            type="text"
+                            value={street}
+                            onChange={(e) => setStreet(e.target.value)}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                        <div className="col-md-3 mb-4">
+                          <label htmlFor="inputCity">City</label>
+                          <input
+                            type="text"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                        <div className="col-md-3">
+                          <label htmlFor="inputZip">PostalCode</label>
+                          <input
+                            type="text"
+                            value={postalCode}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <hr />
+                      <div className="d-flex justify-content-evenly mb-3">
+                        <button
+                          type="submit"
+                          id="button"
+                          onClick={handleUpdateEmployee}
+                          className="btn btn-primary my-3  ml-5"
+                        >
+                          Update Employee
+                        </button>
+                        <button
+                          onClick={() => navigate("/")}
+                          className="btn btn-secondary my-3 mx-4"
+                        >
+                          Back
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      {/* </div>
+      </div> */}
+    </section>
   );
 }

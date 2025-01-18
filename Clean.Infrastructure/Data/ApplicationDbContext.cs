@@ -48,6 +48,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, UserRole, int>
         modelBuilder.ApplyConfiguration(new ApprovalConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
         modelBuilder.ApplyConfiguration(new RequestConfiguration());
+        modelBuilder.Entity<AppUser>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<GetAllEmployees>(entity => entity.HasKey(e => e.Id));
     }
 }

@@ -52,19 +52,15 @@ export default function Request({
   };
 
   const handleStatusClick = async (employeeId, requestId, statusId) => {
-    // console.log(status);
-    // console.log(id);
     try {
       var response = await httpClient.put(`/api/Request/approverequest`, {
         employeeId: employeeId,
         approvalStatusId: statusId,
         requestId: requestId,
       });
-      // .finally(() => setLoading(true));
       console.log(response);
       toast.success("Request status changed sucessfully!!");
       await fetchRequest();
-      // console.log(newRequests);
     } catch (err) {
       console.log(err);
       if (err.response && Array.isArray(err.response.data.errors)) {
@@ -112,7 +108,8 @@ export default function Request({
             <h1>{heading}</h1>
           </div>
           <div className="col-12">
-            <div className="mx-5 mt-3">
+            <div className="mt-3">
+              {/* <div className="mx-5 mt-3"> */}
               {button}
 
               <table className="table table-striped">
@@ -121,7 +118,7 @@ export default function Request({
                     <th scope="col">S.N.</th>
                     <th scope="col">Request By</th>
                     <th scope="col">Request To</th>
-                    <th scope="col">Type</th>
+                    <th scope="col">Description</th>
                     <th scope="col">FromDate</th>
                     <th scope="col">ToDate</th>
                     <th scope="col">Status</th>
@@ -134,7 +131,7 @@ export default function Request({
                         <td>{i + 1}</td>
                         <td>{request.requestedByEmail}</td>
                         <td>{request.requestedToEmail}</td>
-                        <td>{request.requestedType}</td>
+                        <td>{request.description}</td>
                         <td>
                           {
                             new Date(request.fromDate + "z")
@@ -180,7 +177,9 @@ export default function Request({
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="7">No data available</td>
+                      <td colSpan="7" className="text-center">
+                        <strong>--- No data available ---</strong>
+                      </td>
                     </tr>
                   )}
                 </tbody>

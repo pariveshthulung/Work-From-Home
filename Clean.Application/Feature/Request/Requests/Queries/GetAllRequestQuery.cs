@@ -8,6 +8,6 @@ namespace Clean.Application.Feature.Requests.Requests.Queries;
 public class GetAllRequestQuery : IRequest<BaseResult<List<RequestDto>>>
 {
     public QueryObject Query { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 100;
 }

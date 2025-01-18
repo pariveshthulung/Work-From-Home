@@ -29,7 +29,7 @@ export default function ChangePassword() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await httpClient.put("/api/Auth/updatepassword", {
+      const response = await httpClient.put("/api/Auth/updatePassword", {
         currentPassword,
         email,
         newPassword,
@@ -38,8 +38,9 @@ export default function ChangePassword() {
       console.log(response);
       const token = response.data;
       console.log(token);
-      localStorage.setItem("accessToken", token.accessToken);
-      localStorage.setItem("refreshToken", token.refreshToken);
+      localStorage.clear();
+      // localStorage.setItem("accessToken", token.accessToken);
+      // localStorage.setItem("refreshToken", token.refreshToken);
       navigate("/login", {
         state: { showToast: "Password changed successfull!!!" },
       });

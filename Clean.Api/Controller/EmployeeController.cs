@@ -3,6 +3,7 @@ using Clean.Api.Controller.Common;
 using Clean.Api.Extension;
 using Clean.Application.Dto.Employee;
 using Clean.Application.Feature.Employees.Handlers.Commands.LoggedUserProfile;
+using Clean.Application.Feature.Employees.Handlers.Queries.ManagersEmail;
 using Clean.Application.Feature.Employees.Request.Commands;
 using Clean.Application.Feature.Employees.Request.Queries;
 using Clean.Application.Feature.Employees.Requests.Commands;
@@ -19,9 +20,9 @@ namespace Clean.Api.Controller
     public class EmployeeController(IMediator mediator) : BaseController
     {
         #region GetMethod
-        // [Authorize(Policy = "Adminstrator")]
+        [Authorize(Policy = "Adminstrator")]
         [HttpGet("getAllEmployee")]
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [ProducesResponseType(typeof(PagedList<EmployeeDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -77,13 +78,18 @@ namespace Clean.Api.Controller
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetLoggedInUserAsync(CancellationToken cancellationToken)
         {
-            var request = new LoggedUserProfileQuery();
-            var response = await mediator.Send(request, cancellationToken);
-
-            if (!response.Success)
+            try
+            {
+                var request = new LoggedUserProfileQuery();
+                var response = await mediator.Send(request, cancellationToken);
+                if (response.Success)
+                    return Ok(response.Data);
                 return response.ToProblemDetail();
-
-            return Ok(response.Data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("getEmployeeByGuidId")]
@@ -148,6 +154,26 @@ namespace Clean.Api.Controller
                 return response.ToProblemDetail();
 
             return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("getEmployeeManagerEmail")]
+        [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetEmployeeManagerEmail(
+            string email,
+            CancellationToken cancellationToken
+        )
+        {
+            var response = await mediator.Send(
+                new GetEmployeeManagerEmailQuery { Email = email },
+                cancellationToken
+            );
+            if (!response.Success)
+                return response.ToProblemDetail();
+
+            return Ok(response.Data);
         }
     }
 }

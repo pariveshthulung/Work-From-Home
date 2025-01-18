@@ -1,5 +1,3 @@
-using System;
-using System.Net;
 using Clean.Application.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,8 +20,8 @@ public static class ResultExtension
         {
             Status = statusCode,
             Title = result?.Errors?.FirstOrDefault()?.FieldName ?? "Error:",
-            Type = $"https://httpstatuses.com/{statusCode}", // Optional: Link to specific HTTP status code info
-            Extensions = new Dictionary<string, object?> { { "errors", result.Errors.ToList() } }
+            Type = $"https://httpstatuses.com/{statusCode}",
+            Extensions = new Dictionary<string, object?> { { "errors", result?.Errors?.ToList() } }
         };
 
         return new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };

@@ -11,6 +11,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 
 export default function UserRequest() {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const { auth } = useAuth(AuthContext);
@@ -25,9 +26,9 @@ export default function UserRequest() {
   const fetchUserData = useCallback(async () => {
     console.log(auth);
     try {
-      const response = await httpClient.get(
-        `/api/Request/getAllUserRequestQuery?email=${auth.email}`
-      );
+      const response = await httpClient
+        .get(`/api/Request/getAllUserRequestQuery?email=${auth.email}`)
+        .finally(setLoading(false));
       setRequests(response.data); // Assuming response.data contains the list of requests
       console.log("Requests: ", response.data);
     } catch (err) {
@@ -37,16 +38,36 @@ export default function UserRequest() {
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]);
+  }, []);
 
   return (
-    <div>
-      {/* <ToastContainer /> */}
-      <Request
-        heading={"My Request"}
-        requests={requests}
-        button={<Button name="Submit Request" goto="/submitRequest" />}
-      />
-    </div>
+    !loading && (
+      <section className="vh-100 gradient-custom">
+        <div className="container py-5">
+          <div className="row  d-flex justify-content-center h-100">
+            <div className="col-12">
+              <div
+                className="card bg-light text-dark"
+                style={{ borderRadius: "1rem" }}
+              >
+                <div className="mt-4 mx-5 text-center">
+                  <h1>My Requests</h1>
+                </div>
+                <div>
+                  <div className="mb-3">
+                    <Request
+                      requests={requests}
+                      button={
+                        <Button name="Submit Request" goto="/submitRequest" />
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
   );
 }

@@ -5,7 +5,6 @@ public class Address
     public string Street { get; private set; } = default!;
     public string City { get; private set; } = default!;
     public string PostalCode { get; private set; } = default!;
-    public bool IsDeleted { get; set; }
 
     private Address() { }
 
@@ -14,7 +13,6 @@ public class Address
         Street = ValidationGuard.ValidateString(street, nameof(street));
         City = ValidationGuard.ValidateString(city, nameof(city));
         PostalCode = ValidationGuard.ValidateString(postalCode, nameof(postalCode));
-        IsDeleted = false;
     }
 
     public static Address Create(string street, string city, string postalCode)
@@ -28,9 +26,4 @@ public class Address
         City = city;
         PostalCode = postalCode;
     }
-
-    // public Clean.Application.Dto.Address.AddressDto ToAddressDto()
-    // {
-    //     throw new NotImplementedException();
-    // }
 }

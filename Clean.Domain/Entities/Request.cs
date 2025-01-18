@@ -13,6 +13,7 @@ namespace Clean.Domain.Entities
         public Employee? RequestedToEmployee { get; private set; }
         public int RequestedTypeId { get; private set; }
         public RequestedType? RequestedType { get; private set; }
+        public string Description { get; private set; } = default!;
         public Approval? Approval { get; private set; }
         public DateTime ToDate { get; private set; }
         public DateTime FromDate { get; private set; }
@@ -24,31 +25,17 @@ namespace Clean.Domain.Entities
         protected Request(
             int requestBy,
             int requestTo,
-            int requestedTypeId,
             DateTime fromDate,
-            DateTime toDate
+            DateTime toDate,
+            string description
         )
         {
             RequestedBy = requestBy;
             RequestedTo = requestTo;
-            RequestedTypeId = requestedTypeId;
             FromDate = ValidationGuard.ValidateFromDate(fromDate, nameof(FromDate));
             ToDate = ValidationGuard.ValidateToDate(toDate, fromDate, nameof(ToDate));
-        }
-
-        public void SetIsDeleted(bool isDeleted)
-        {
-            IsDeleted = isDeleted;
-        }
-
-        public void SetId(int id)
-        {
-            Id = id;
-        }
-
-        public void SetGuiId(Guid guidId)
-        {
-            GuidId = guidId;
+            Description = ValidationGuard.ValidateString(description, nameof(Description));
+            RequestedTypeId = RequestTypeEnum.WorkFromHome.Id;
         }
 
         public virtual void Submit(int requestId)

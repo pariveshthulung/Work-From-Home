@@ -7,11 +7,13 @@ namespace Clean.Application.Dto.Employee;
 public record EmployeeDto : BaseDto
 {
     public int Id { get; init; }
-    public string Name { get; init; }
-    public string Email { get; init; }
+    public string Name { get; init; } = default!;
+    public string Email { get; init; } = default!;
     public int UserRoleId { get; init; }
-    public string UserRole { get; init; }
-    public string PhoneNumber { get; init; }
-    public AddressDto Address { get; init; }
-    public List<RequestDto> Requests { get; init; }
+    public string UserRole { get; init; } = default!;
+    public string PhoneNumber { get; init; } = default!;
+    public int ManagerId { get; init; } = default!;
+    public string ManagerEmail { get; init; } = default!;
+    public AddressDto Address { get; init; } = default!;
+    public List<RequestDto> Requests { get; init; } = default!;
 }

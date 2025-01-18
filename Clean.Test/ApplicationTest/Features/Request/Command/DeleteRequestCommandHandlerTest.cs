@@ -40,7 +40,12 @@ public class DeleteRequestCommandHandlerTest
         result.Success.Should().BeFalse();
         result.Errors.Should().Contain(EmployeeErrors.NotFound());
         _employeeRepoMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -76,7 +81,12 @@ public class DeleteRequestCommandHandlerTest
         result.Success.Should().BeFalse();
         result.Errors.Should().Contain(RequestErrors.NotFound());
         _employeeRepoMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
     }
@@ -100,8 +110,14 @@ public class DeleteRequestCommandHandlerTest
         employee.SetGuidId(employeeId);
         employee.SetId(1);
 
-        var request = GeneralRequest.Create(1, 2, 1, DateTime.UtcNow, DateTime.UtcNow.AddDays(2));
-        request.SetGuiId(requestId);
+        var request = GeneralRequest.Create(
+            1,
+            2,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddDays(2),
+            "sick"
+        );
+        request.SetGuidId(requestId);
 
         employee.SubmitRequest(request);
 
@@ -115,7 +131,12 @@ public class DeleteRequestCommandHandlerTest
         //Assert
         result.Success.Should().BeTrue();
         _employeeRepoMock.Verify(
-            x => x.UpdateEmployeeAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.UpdateEmployeeAsync(
+                    It.IsAny<Employee>(),
+                    It.IsAny<Employee>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
     }

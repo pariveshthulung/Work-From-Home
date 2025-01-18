@@ -16,12 +16,19 @@ public class GetEmployeeByEmailQueryHandler(IEmployeeRepository employeeReposito
         CancellationToken cancellationToken
     )
     {
-        var employee = await employeeRepository.GetEmployeeByEmailAsync(
-            request.Email,
-            cancellationToken
-        );
-        if (employee is null)
-            return BaseResult<EmployeeDto>.Failure(EmployeeErrors.NotFound());
-        return BaseResult<EmployeeDto>.Ok(mapper.Map<EmployeeDto>(employee));
+        try
+        {
+            var employee = await employeeRepository.GetEmployeeByEmailAsync(
+                request.Email,
+                cancellationToken
+            );
+            if (employee is null)
+                return BaseResult<EmployeeDto>.Failure(EmployeeErrors.NotFound());
+            return BaseResult<EmployeeDto>.Ok(mapper.Map<EmployeeDto>(employee));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

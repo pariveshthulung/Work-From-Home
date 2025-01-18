@@ -25,7 +25,16 @@ public class GetUserRoleQueryHandler
         CancellationToken cancellationToken
     )
     {
-        List<UserRole> userRoles = await _enumRepo.GetRolesAsync(cancellationToken);
-        return BaseResult<List<UserRoleEnumDto>>.Ok(_mapper.Map<List<UserRoleEnumDto>>(userRoles));
+        try
+        {
+            List<UserRole> userRoles = await _enumRepo.GetRolesAsync(cancellationToken);
+            return BaseResult<List<UserRoleEnumDto>>.Ok(
+                _mapper.Map<List<UserRoleEnumDto>>(userRoles)
+            );
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

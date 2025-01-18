@@ -25,27 +25,34 @@ public class GetAllRequestSubmitToUserHandler
         CancellationToken cancellationToken
     )
     {
-        var employees = await _employeeRepository.GetAllEmployeeAsync(
-            query.Query.SearchTerm,
-            query.Query.SortColumn,
-            query.Query.SortOrder,
-            query.Query.PageNumber,
-            query.Query.PageSize,
-            cancellationToken
-        );
-        var employee = await _employeeRepository.GetEmployeeByEmailAsync(
-            query.Email,
-            cancellationToken
-        );
-        if (employee is null)
-            return BaseResult<List<RequestDto>>.Failure(RequestErrors.NotFound());
-        var requests = employees
-            .Items.SelectMany(x => x.Requests)
-            .Where(x =>
-                x.RequestedTo == employee.Id
-                && x.Approval.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
-            )
-            .ToList();
-        return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+        try
+        {
+            var employees = await _employeeRepository.GetAllEmployeeAsync(
+                query.Query.SearchTerm,
+                query.Query.SortColumn,
+                query.Query.SortOrder,
+                query.Query.PageNumber,
+                query.Query.PageSize,
+                cancellationToken
+            );
+            var employee = await _employeeRepository.GetEmployeeByEmailAsync(
+                query.Email,
+                cancellationToken
+            );
+            if (employee is null)
+                return BaseResult<List<RequestDto>>.Failure(RequestErrors.NotFound());
+            var requests = employees
+                .Items.SelectMany(x => x.Requests)
+                .Where(x =>
+                    x.RequestedTo == employee.Id
+                    && x.Approval.ApprovalStatusId == ApprovalStatusEnum.Pending.Id
+                )
+                .ToList();
+            return BaseResult<List<RequestDto>>.Ok(_mapper.Map<List<RequestDto>>(requests));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

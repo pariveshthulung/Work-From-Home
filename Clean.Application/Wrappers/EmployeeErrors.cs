@@ -1,5 +1,3 @@
-using System;
-
 namespace Clean.Application.Wrappers;
 
 public class EmployeeErrors
